@@ -191,6 +191,15 @@
   .mini-day.wish{background:var(--wish-bg); color:var(--wish); font-weight:700;}
   .final-chip{background:var(--accent-soft); color:#1F5045; font-weight:600; border:1px solid #C4DCD5;}
 
+  /* ---------- Live-Vorschau ---------- */
+  .pv-day{min-height:4.6rem;}
+  .pv-line{
+    font-size:0.68rem; line-height:1.35; border-left:3px solid var(--line);
+    padding-left:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .pv-line .pv-tag{color:var(--ink-soft); font-weight:600;}
+  .pv-line.unset{color:var(--warn); font-weight:600; border-left-color:var(--warn);}
+
   /* ---------- Druckansicht ---------- */
   .print-sheet{display:none;}
   @media print{
@@ -393,7 +402,13 @@ function pastLoad(state, monthKey){
 
 /* =====================  Plan-Generator  ===================== */
 
-function generatePlan({days, groups, participants, blocked, wishes, people, departments, rules, past}){
+function generatePlan({days, groups, participants, blocked, wishes, people, departments, rules, past, seed, iterations}){
+  /* Bei gesetztem Seed rechnet der Generator deterministisch – gleiche Eingaben, gleiche Vorschau */
+  let _s = (typeof seed === "number") ? (seed >>> 0) || 1 : null;
+  const rnd = _s !== null
+    ? function(){ _s |= 0; _s = _s + 0x6D2B79F5 | 0; let t = Math.imul(_s ^ _s >>> 15, 1 | _s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }
+    : Math.random;
+
   const prioDept = departments.find(dp=>dp.priority);
   const prioId = prioDept ? prioDept.id : null;
   const personById = {}; people.forEach(p=>personById[p.id]=p);
@@ -408,7 +423,7 @@ function generatePlan({days, groups, participants, blocked, wishes, people, depa
   const pastOf = pid => past[pid] || {total:0, special:0};
 
   let best = null, bestScore = Infinity;
-  const ITER = 800;
+  const ITER = iterations || 800;
 
   for(let iter=0; iter<ITER; iter++){
     const res = attempt();
@@ -447,7 +462,7 @@ function generatePlan({days, groups, participants, blocked, wishes, people, depa
     }
     function shuffled(arr){
       const a = arr.slice();
-      for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+      for(let i=a.length-1;i>0;i--){ const j=Math.floor(rnd()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
       return a;
     }
     /* Basisbewertung eines Kandidaten: weniger ist besser */
@@ -458,7 +473,7 @@ function generatePlan({days, groups, participants, blocked, wishes, people, depa
       let gap = 99;
       assigned[pid].forEach(x=>{ gap = Math.min(gap, Math.abs(x - d)); });
       s -= Math.min(gap, 14)*4;
-      return s + Math.random()*10;
+      return s + rnd()*10;
     }
     function pickBest(cands, d, special, bonusFn){
       let bp = null, bs = Infinity;
@@ -780,13 +795,11 @@ function App(){
         <button className={tab==="team"?"active":""} onClick={()=>setTab("team")}>Team &amp; Regeln</button>
         <button className={tab==="planung"?"active":""} onClick={()=>setTab("planung")}>Monatsplanung</button>
         <button className={tab==="statistik"?"active":""} onClick={()=>setTab("statistik")}>Statistik</button>
-        <button className={tab==="wunsch"?"active":""} onClick={()=>setTab("wunsch")}>Wünsche erfassen</button>
       </nav>
       <main>
         {tab==="team" && <div className="no-print"><TeamTab state={state} update={update}/></div>}
         {tab==="planung" && <PlanTab state={state} update={update} monthKey={monthKey} setMonthKey={setMonthKey}/>}
         {tab==="statistik" && <div className="no-print"><StatsTab state={state} monthKey={monthKey} setMonthKey={setMonthKey}/></div>}
-        {tab==="wunsch" && <div className="no-print"><WishTab state={state}/></div>}
       </main>
     </div>
   );
@@ -913,12 +926,39 @@ function PlanTab({state, update, monthKey, setMonthKey}){
   const days = useMemo(()=>buildDays(year, month), [monthKey]);
   const groups = useMemo(()=>weekendGroups(days), [days]);
   const m = state.months[monthKey];
-  const wishFileRef = useRef(null);
   const [swapA, setSwapA] = useState("");
   const [swapB, setSwapB] = useState("");
   const [swapMsg, setSwapMsg] = useState(null);
   const [wishView, setWishView] = useState("liste");
   const [openPid, setOpenPid] = useState(null);
+  const [previewOn, setPreviewOn] = useState(true);
+  const [preview, setPreview] = useState(null);
+
+  /* Live-Vorschau: berechnet sich automatisch neu, sobald sich Eingaben ändern */
+  const previewSig = JSON.stringify([
+    monthKey,
+    m ? m.participants : null,
+    m ? m.blocked : null,
+    m ? m.wishes : null,
+    state.rules,
+    state.people.map(p=>[p.id, p.deptId, p.slots, p.maxServices, p.active])
+  ]);
+  useEffect(()=>{
+    if(!previewOn || !m || (m.participants||[]).length < 2){ setPreview(null); return; }
+    const t = setTimeout(()=>{
+      let h = 5381;
+      for(let i=0; i<previewSig.length; i++){ h = ((h<<5) + h + previewSig.charCodeAt(i)) | 0; }
+      const res = generatePlan({
+        days, groups, participants: m.participants,
+        blocked: m.blocked || {}, wishes: m.wishes || {},
+        people: state.people, departments: state.departments,
+        rules: state.rules, past: pastLoad(state, monthKey),
+        seed: Math.abs(h), iterations: 250
+      });
+      setPreview(res.plan);
+    }, 350);
+    return ()=>clearTimeout(t);
+  }, [previewSig, previewOn]);
 
   useEffect(()=>{
     if(!state.months[monthKey]){
@@ -1062,43 +1102,6 @@ function PlanTab({state, update, monthKey, setMonthKey}){
       .slice(0,3);
   }
 
-  /* Wunsch-Dateien der Mitarbeiter einlesen */
-  function importWishes(ev){
-    const files = Array.from(ev.target.files || []);
-    if(!files.length) return;
-    let done = 0, fail = [];
-    files.forEach(file=>{
-      const reader = new FileReader();
-      reader.onload = ()=>{
-        try{
-          const w = JSON.parse(reader.result);
-          if(w.type!=="dienstwunsch" || !w.monthKey) throw new Error("Format");
-          let person = state.people.find(p=>p.id===w.personId);
-          if(!person && w.personName) person = state.people.find(p=>p.name.trim().toLowerCase()===w.personName.trim().toLowerCase());
-          if(!person){ fail.push(w.personName || file.name); }
-          else{
-            update(s=>{
-              if(!s.months[w.monthKey]) s.months[w.monthKey] = {participants: s.people.filter(p=>p.active).map(p=>p.id), blocked:{}, wishes:{}, wishStatus:{}, deadline:null, plan:null};
-              const mm = s.months[w.monthKey];
-              if(!mm.wishes) mm.wishes = {};
-              if(!mm.wishStatus) mm.wishStatus = {};
-              mm.blocked[person.id] = (w.blocked||[]).slice();
-              mm.wishes[person.id] = (w.wishes||[]).slice();
-              mm.wishStatus[person.id] = true;
-              if(!mm.participants.includes(person.id)) mm.participants.push(person.id);
-            });
-          }
-        }catch(e){ fail.push(file.name); }
-        done++;
-        if(done===files.length){
-          alert((files.length - fail.length) + " Wunsch-Datei(en) übernommen." + (fail.length ? " Nicht zuordenbar: " + fail.join(", ") : ""));
-        }
-      };
-      reader.readAsText(file);
-    });
-    ev.target.value = "";
-  }
-
   /* Tauschfunktion */
   const allAssignments = [];
   if(m.plan){
@@ -1164,8 +1167,6 @@ function PlanTab({state, update, monthKey, setMonthKey}){
             <input type="month" value={monthKey} onChange={e=>{ if(e.target.value) setMonthKey(e.target.value); }}/>
           </label>
           <div className="head-spacer"></div>
-          <button className="btn secondary" onClick={()=>wishFileRef.current.click()}>Wünsche importieren</button>
-          <input ref={wishFileRef} type="file" accept=".json" multiple style={{display:"none"}} onChange={importWishes}/>
           <button className="btn secondary" onClick={resetMonth}>Monat zurücksetzen</button>
           <button className="btn" onClick={runGenerate}>Plan generieren</button>
           <button className="btn secondary" onClick={()=>exportExcel(state, monthKey)} disabled={!m.plan}>Excel</button>
@@ -1221,7 +1222,7 @@ function PlanTab({state, update, monthKey, setMonthKey}){
           <button className={"btn small" + (wishView==="liste"?"":" secondary")} onClick={()=>setWishView("liste")}>Personenliste</button>
           <button className={"btn small" + (wishView==="matrix"?"":" secondary")} onClick={()=>setWishView("matrix")}>Matrix</button>
         </div>
-        <p className="hint">Einmal klicken sperrt einen Tag (✕, wird immer eingehalten), zweimal klicken macht ihn zum Wunschtag (✓, wird bevorzugt vergeben), dreimal klicken setzt ihn zurück. Alle Einträge bleiben pro Monat gespeichert – Wünsche können also nach und nach eintreffen und der Plan jederzeit neu generiert werden. Die Ampel zeigt den Stand: grün = vom Planer als abgeschlossen markiert, gelb = Einträge vorhanden, aber noch offen, rot = noch keine Einträge. Der Monat gilt als FINAL, sobald alle abgeschlossen sind oder der Stichtag verstrichen ist. Importierte Wunsch-Dateien setzen die Person automatisch auf abgeschlossen.</p>
+        <p className="hint">Einmal klicken sperrt einen Tag (✕, wird immer eingehalten), zweimal klicken macht ihn zum Wunschtag (✓, wird bevorzugt vergeben), dreimal klicken setzt ihn zurück. Alle Einträge bleiben pro Monat gespeichert – Wünsche können also nach und nach eintreffen und der Plan jederzeit neu generiert werden. Die Ampel zeigt den Stand: grün = vom Planer als abgeschlossen markiert, gelb = Einträge vorhanden, aber noch offen, rot = noch keine Einträge. Der Monat gilt als FINAL, sobald alle abgeschlossen sind oder der Stichtag verstrichen ist.</p>
 
         {wishView==="liste" &&
         <div>
@@ -1313,6 +1314,68 @@ function PlanTab({state, update, monthKey, setMonthKey}){
             </tbody>
           </table>
         </div>}
+      </div>}
+
+      {participants.length>0 &&
+      <div className="card">
+        <div className="toolbar">
+          <h2 style={{marginBottom:0}}>Live-Vorschau {MONTH_NAMES[month-1]} {year}</h2>
+          <div className="head-spacer"></div>
+          <button className="btn small secondary" onClick={()=>setPreviewOn(!previewOn)}>{previewOn ? "Vorschau ausblenden" : "Vorschau anzeigen"}</button>
+        </div>
+        {previewOn && <React.Fragment>
+          <p className="hint" style={{marginTop:"0.5rem"}}>Dieser Entwurf berechnet sich bei jeder Änderung der Sperr- und Wunschtage automatisch neu und zeigt, wie der Plan zum jetzigen Stand aussehen würde. Verbindlich (inkl. manueller Nachbearbeitung, Tausch, Excel und Druck) wird der Plan erst über „Plan generieren".</p>
+          {!preview && <p className="muted" style={{fontSize:"0.86rem"}}>Vorschau wird berechnet …</p>}
+          {preview && (()=>{
+            let pEmpty = 0;
+            days.forEach(day=>{ const t = preview[day.d] || {}; if(!t.ruf) pEmpty++; if(!t.ber) pEmpty++; });
+            const gsets = {}; participants.forEach(pid=> gsets[pid] = new Set());
+            groups.forEach((grp, gi)=> grp.forEach(d=>{ const t = preview[d] || {};
+              [t.ruf, t.ber].forEach(pid=>{ if(pid && gsets[pid]) gsets[pid].add(gi); }); }));
+            const second = participants.filter(pid=> gsets[pid].size > 1).length;
+            const isP = pid => !!(pid && personById[pid] && prio && personById[pid].deptId===prio.id);
+            let ouMiss = 0;
+            groups.forEach(grp=> grp.forEach(d=>{ const t = preview[d] || {}, prev = preview[d-1];
+              if(!(isP(t.ruf) || isP(t.ber) || (prev && isP(prev.ber)))) ouMiss++; }));
+            return (
+              <React.Fragment>
+                <div className="cal-grid">
+                  {["Mo","Di","Mi","Do","Fr","Sa","So"].map(w=><div key={w} className="cal-head">{w}</div>)}
+                  {cells.map((day, i)=>{
+                    if(!day) return <div key={"e"+i} className="cal-day empty-cell"></div>;
+                    const t = preview[day.d] || {ruf:null, ber:null};
+                    const conflict = !t.ruf || !t.ber;
+                    return (
+                      <div key={day.d} className={"cal-day pv-day" + (day.holidayName?" holiday":(day.isWE?" we":"")) + (conflict?" conflict":"")}>
+                        <div className="cal-daynum">
+                          <span className="mono">{day.d}</span>
+                          {day.holidayName && <span className="htag" title={day.holidayName}>{day.holidayName}</span>}
+                          {day.isWE && !day.holidayName && <span className="wetag">WE</span>}
+                        </div>
+                        {["ruf","ber"].map(slot=>{
+                          const pid = t[slot];
+                          const dp = pid && personById[pid] ? deptById[personById[pid].deptId] : null;
+                          return (
+                            <div key={slot} className={"pv-line" + (pid ? "" : " unset")}
+                              style={pid && dp ? {borderLeftColor: dp.color} : {}}
+                              title={(slot==="ruf"?"Rufdienst: ":"Bereitschaft: ") + (pid && personById[pid] ? personById[pid].name : "unbesetzt")}>
+                              <span className="pv-tag">{slot==="ruf" ? "R" : "B"}</span> {pid && personById[pid] ? personById[pid].name : "unbesetzt"}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="legend">
+                  <span className="chip" style={pEmpty ? {background:"var(--warn-bg)", border:"1px solid var(--warn-line)"} : {}}>{pEmpty} unbesetzt</span>
+                  <span className="chip">{second} Person{second===1?"":"en"} mit 2. Wochenende</span>
+                  {prio && <span className="chip">{ouMiss} WE-Tag{ouMiss===1?"":"e"} ohne {prio.name}</span>}
+                </div>
+              </React.Fragment>
+            );
+          })()}
+        </React.Fragment>}
       </div>}
 
       {m.plan &&
@@ -1557,83 +1620,6 @@ function StatsTab({state, monthKey, setMonthKey}){
             })}
           </tbody>
         </table>}
-      </div>
-    </div>
-  );
-}
-
-/* ---------- Wünsche erfassen (Mitarbeiter-Ansicht) ---------- */
-
-function WishTab({state}){
-  const [pid, setPid] = useState("");
-  const [freeName, setFreeName] = useState("");
-  const [mk, setMk] = useState(defaultMonthKey());
-  const [blocked, setBlocked] = useState([]);
-  const [wishes, setWishes] = useState([]);
-  const {year, month} = parseMonthKey(mk);
-  const days = buildDays(year, month);
-
-  useEffect(()=>{ setBlocked([]); setWishes([]); }, [mk, pid]);
-
-  function cycle(d){
-    if(blocked.includes(d)){ setBlocked(blocked.filter(x=>x!==d)); setWishes(wishes.concat([d])); }
-    else if(wishes.includes(d)){ setWishes(wishes.filter(x=>x!==d)); }
-    else { setBlocked(blocked.concat([d])); }
-  }
-  function doExport(){
-    const person = state.people.find(p=>p.id===pid);
-    const name = person ? person.name : freeName.trim();
-    if(!name){ alert("Bitte Name auswählen oder eintragen."); return; }
-    const payload = {
-      type:"dienstwunsch", monthKey:mk,
-      personId: person ? person.id : null,
-      personName: name,
-      blocked: blocked.slice().sort((a,b)=>a-b),
-      wishes: wishes.slice().sort((a,b)=>a-b)
-    };
-    download("Wunsch_" + name.replace(/\s+/g,"_") + "_" + mk + ".json", JSON.stringify(payload, null, 2), "application/json");
-  }
-
-  const firstWd = (days[0].wd + 6) % 7;
-  const cells = [];
-  for(let i=0;i<firstWd;i++) cells.push(null);
-  days.forEach(day=>cells.push(day));
-  while(cells.length % 7 !== 0) cells.push(null);
-
-  return (
-    <div>
-      <div className="card">
-        <h2>Dienstwünsche abgeben</h2>
-        <p className="hint">Für Mitarbeiter: Name und Monat wählen, dann Tage anklicken – einmal für „kann nicht" (✕), zweimal für „Wunschtag" (✓), dreimal zum Zurücksetzen. Anschließend „Wünsche exportieren" und die Datei an die Dienstplanung schicken. Keine markierten Tage bedeutet keine Einschränkung.</p>
-        <div className="flexrow" style={{marginBottom:"0.8rem"}}>
-          <select value={pid} onChange={e=>setPid(e.target.value)}>
-            <option value="">Name wählen …</option>
-            {state.people.filter(p=>p.active).map(p=><option key={p.id} value={p.id}>{p.name}</option>)}
-          </select>
-          {!pid && <input type="text" placeholder="… oder Name eintragen" value={freeName} onChange={e=>setFreeName(e.target.value)}/>}
-          <input type="month" value={mk} onChange={e=>{ if(e.target.value) setMk(e.target.value); }}/>
-        </div>
-        <div className="cal-grid" style={{maxWidth:"40rem"}}>
-          {["Mo","Di","Mi","Do","Fr","Sa","So"].map(w=><div key={w} className="cal-head">{w}</div>)}
-          {cells.map((day, i)=>{
-            if(!day) return <div key={"e"+i} className="cal-day empty-cell" style={{minHeight:"2.6rem"}}></div>;
-            const b = blocked.includes(day.d), w = wishes.includes(day.d);
-            return (
-              <div key={day.d}
-                className={"cal-day" + (day.holidayName?" holiday":(day.isWE?" we":""))}
-                style={{minHeight:"2.6rem", cursor:"pointer", alignItems:"center", justifyContent:"center",
-                  background: b ? "var(--ink)" : (w ? "var(--wish-bg)" : undefined),
-                  color: b ? "#fff" : (w ? "var(--wish)" : undefined), fontWeight: (b||w)?700:400}}
-                title={day.holidayName || ""}
-                onClick={()=>cycle(day.d)}>
-                <span className="mono" style={{fontSize:"0.85rem"}}>{day.d}{b?" ✕":""}{w?" ✓":""}</span>
-              </div>
-            );
-          })}
-        </div>
-        <div style={{marginTop:"0.9rem"}}>
-          <button className="btn" onClick={doExport}>Wünsche exportieren</button>
-        </div>
       </div>
     </div>
   );

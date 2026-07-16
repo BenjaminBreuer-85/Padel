@@ -112,6 +112,7 @@
   .matrix .daycell:hover{outline:1.5px solid var(--accent); outline-offset:-1.5px;}
   .matrix .daycell.blocked{background:var(--ink); color:#fff;}
   .matrix .daycell.wish{background:var(--wish-bg); color:var(--wish); font-weight:700;}
+  .matrix .daycell.vac{background:#3F6E92; color:#fff; font-weight:700;}
   .matrix .dayhead{font-size:0.68rem; text-align:center; min-width:2rem;}
   .matrix .dayhead.we{background:var(--we-bg);}
   .matrix .dayhead.holiday{background:var(--holiday-bg);}
@@ -189,6 +190,7 @@
   .mini-day:hover{outline:1.5px solid var(--accent); outline-offset:-1.5px;}
   .mini-day.blocked{background:var(--ink); color:#fff; border-color:var(--ink); font-weight:700;}
   .mini-day.wish{background:var(--wish-bg); color:var(--wish); font-weight:700;}
+  .mini-day.vac{background:#3F6E92; color:#fff; border-color:#3F6E92; font-weight:700;}
   .final-chip{background:var(--accent-soft); color:#1F5045; font-weight:600; border:1px solid #C4DCD5;}
 
   /* ---------- Live-Vorschau ---------- */
@@ -235,7 +237,7 @@ const {useState, useEffect, useMemo, useRef} = React;
 
 /* =====================  Konstanten & Hilfsfunktionen  ===================== */
 
-const STORAGE_KEY = "dienstplan-chirurgie-v3";
+const STORAGE_KEY = "dienstplan-chirurgie-v4";
 const WD_SHORT = ["So","Mo","Di","Mi","Do","Fr","Sa"];
 const MONTH_NAMES = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
 const DEPT_COLORS = ["#2F7061","#3F6E92","#8A5784","#B07C2A","#5E7B3B","#A85252"];
@@ -244,7 +246,7 @@ function uid(){ return Math.random().toString(36).slice(2,10); }
 
 function defaultState(){
   const D = {ou:"ou", tho:"tho", ach:"ach", kin:"kin", pla:"pla"};
-  const P = (name, deptId, slots)=>({id:uid(), name, deptId, active:true, maxServices:null, slots: slots||"beide"});
+  const P = (name, deptId, slots, pensum)=>({id:uid(), name, deptId, active:true, pensum: pensum||1, slots: slots||"beide"});
   return {
     departments: [
       {id:D.ou, name:"Orthopädie / Unfallchirurgie", color:DEPT_COLORS[0], priority:true},
@@ -265,17 +267,15 @@ function defaultState(){
       P("Merve Deniz", D.tho),
       P("Seyran Duran", D.tho),
       P("Maria Camilla Vedovelli", D.tho),
-      P("Jung Koh", D.tho),
       P("Clara Hülser", D.ach),
       P("Fenny Tanjaya", D.ach),
       P("Larissa Wahlefeld", D.ach),
-      P("Laura Contreras Henk", D.kin),
       P("Rebecca Kastl", D.kin),
-      P("Bianca Heusch", D.pla),
-      P("Alexander Schroeder-Finckh", D.pla),
+      P("Zoha Khan", D.kin, "ruf"),
+      P("Bianca Heusch", D.pla, "beide", 0.5),
       P("Charlotte Weinmann", D.pla),
     ],
-    rules: { maxServices:5, maxWeekends:1, fairnessMonths:3 },
+    rules: { maxBer:4, maxWeekends:1, hardWeekends:2, fairnessMonths:3 },
     months: {}
   };
 }
@@ -285,17 +285,11 @@ function loadState(){
     const raw = localStorage.getItem(STORAGE_KEY);
     if(raw){ const s = JSON.parse(raw); if(s && s.departments && s.people){
       if(!s.rules.fairnessMonths) s.rules.fairnessMonths = 3;
-      s.people.forEach(p=>{ if(!p.slots) p.slots = "beide"; });
+      if(!s.rules.maxBer) s.rules.maxBer = 4;
+      if(!s.rules.hardWeekends) s.rules.hardWeekends = 2;
+      s.people.forEach(p=>{ if(!p.slots) p.slots = "beide"; if(!p.pensum) p.pensum = 1; });
       return s;
     }}
-    // Migration von v2: nur übernehmen, wenn dort bereits Personen angelegt wurden
-    const old = localStorage.getItem("dienstplan-chirurgie-v2");
-    if(old){ const s = JSON.parse(old);
-      if(s && s.departments && s.people && s.people.length){
-        if(!s.rules.fairnessMonths) s.rules.fairnessMonths = 3;
-        s.people.forEach(p=>{ if(!p.slots) p.slots = "beide"; });
-        return s;
-      } }
   }catch(e){}
   return defaultState();
 }
@@ -375,8 +369,10 @@ function dayWeekendGroupIndex(groups, d){
   return null;
 }
 
-function personMax(person, rules){
-  return (person && person.maxServices) ? person.maxServices : rules.maxServices;
+/* Maximale Bereitschaftsdienste je nach Pensum (50 % Teilzeit = halbes Limit) */
+function personMaxBer(person, rules){
+  const base = rules.maxBer || 4;
+  return (person && person.pensum && person.pensum < 1) ? Math.max(1, Math.round(base * person.pensum)) : base;
 }
 
 /* Belastung der Vormonate für die faire Verteilung */
@@ -402,7 +398,7 @@ function pastLoad(state, monthKey){
 
 /* =====================  Plan-Generator  ===================== */
 
-function generatePlan({days, groups, participants, blocked, wishes, people, departments, rules, past, seed, iterations}){
+function generatePlan({days, groups, participants, blocked, vacation, wishes, people, departments, rules, past, seed, iterations}){
   /* Bei gesetztem Seed rechnet der Generator deterministisch – gleiche Eingaben, gleiche Vorschau */
   let _s = (typeof seed === "number") ? (seed >>> 0) || 1 : null;
   const rnd = _s !== null
@@ -413,7 +409,21 @@ function generatePlan({days, groups, participants, blocked, wishes, people, depa
   const prioId = prioDept ? prioDept.id : null;
   const personById = {}; people.forEach(p=>personById[p.id]=p);
   const deptOf = pid => personById[pid] ? personById[pid].deptId : null;
-  const maxOf = pid => personMax(personById[pid], rules);
+  const maxBerOf = pid => personMaxBer(personById[pid], rules);
+  const pensumOf = pid => (personById[pid] && personById[pid].pensum) || 1;
+  /* Urlaub: absolut dienstfrei; angrenzende Wochenendblöcke (Abstand ≤ 2 Tage) möglichst frei halten */
+  const hardBlock = {}, protectedWE = {};
+  participants.forEach(pid=>{
+    const vac = (vacation && vacation[pid]) || [];
+    hardBlock[pid] = new Set([].concat((blocked && blocked[pid]) || [], vac));
+    const s = new Set();
+    if(vac.length){
+      groups.forEach((grp, gi)=>{
+        if(grp.some(gd=> vac.some(vd=> Math.abs(gd - vd) <= 2))) s.add(gi);
+      });
+    }
+    protectedWE[pid] = s;
+  });
   const canSlot = (pid, slot)=>{
     const sp = (personById[pid] && personById[pid].slots) || "beide";
     return sp==="beide" || sp===slot;
@@ -453,21 +463,19 @@ function generatePlan({days, groups, participants, blocked, wishes, people, depa
     participants.forEach(pid=>{ counts[pid]=0; bers[pid]=0; assigned[pid]=new Set(); weGrp[pid]=new Set(); });
 
     function baseChecks(pid, d){
-      if(counts[pid] >= maxOf(pid)) return false;
-      if(blocked[pid] && blocked[pid].includes(d)) return false;
+      if(hardBlock[pid] && hardBlock[pid].has(d)) return false;
       if(assigned[pid].has(d) || assigned[pid].has(d-1) || assigned[pid].has(d+1)) return false;
       return true;
     }
-    function can(pid, d){
+    /* Harte Regeln: max. Bereitschaftsdienste, max. 2 Wochenend-/Feiertagsblöcke */
+    function can(pid, d, slot){
       if(!baseChecks(pid, d)) return false;
+      if(slot==="ber" && bers[pid] >= maxBerOf(pid)) return false;
       const g = dayWeekendGroupIndex(groups, d);
-      if(g!==null && !weGrp[pid].has(g) && weGrp[pid].size >= rules.maxWeekends) return false;
+      if(g!==null && !weGrp[pid].has(g) && weGrp[pid].size >= (rules.hardWeekends || 2)) return false;
       return true;
     }
-    /* Weiche Variante: erlaubt ein zusätzliches Wochenende, wenn sonst nichts geht */
-    function canRelaxed(pid, d){
-      return baseChecks(pid, d);
-    }
+    const canRelaxed = can;
     function assign(pid, d, slot){
       plan[d][slot] = pid;
       counts[pid]++; if(slot==="ber") bers[pid]++;
@@ -482,10 +490,15 @@ function generatePlan({days, groups, participants, blocked, wishes, people, depa
     }
     /* Basisbewertung eines Kandidaten: weniger ist besser */
     function baseScore(pid, d, special){
-      let s = counts[pid]*100 + pastOf(pid).total*6;
-      if(special) s += pastOf(pid).special*25;
+      let s = (counts[pid]/pensumOf(pid))*100 + pastOf(pid).total*6;
+      if(special){
+        s += pastOf(pid).special*25;
+        const g = dayWeekendGroupIndex(groups, d);
+        if(g!==null && !weGrp[pid].has(g) && weGrp[pid].size >= rules.maxWeekends) s += 650;
+        if(g!==null && protectedWE[pid] && protectedWE[pid].has(g)) s += 550;
+      }
       if(tune[pid]) s += 250;
-      if(isWish(pid, d)) s -= 90;
+      if(isWish(pid, d)) s -= 400;
       let gap = 99;
       assigned[pid].forEach(x=>{ gap = Math.min(gap, Math.abs(x - d)); });
       s -= Math.min(gap, 14)*4;
@@ -516,17 +529,17 @@ function generatePlan({days, groups, participants, blocked, wishes, people, depa
       if(grp.length >= 3){
         const f = grp[0], sa = grp[1], so = grp[2];
         // B: erster Tag Bereitschaft + dritter Tag Ruf, bevorzugt Prioritätsabteilung (benötigt beide Dienstarten)
-        let candFS = participants.filter(p=> canSlot(p,"ruf") && canSlot(p,"ber") && can(p,f) && can(p,so));
+        let candFS = participants.filter(p=> canSlot(p,"ruf") && canSlot(p,"ber") && can(p,f,"ber") && can(p,so,"ruf"));
         const B = pickBest(candFS, f, true, p=> deptOf(p)===prioId ? -200 : 0);
         if(B){ assign(B, f, "ber"); assign(B, so, "ruf"); }
         // A: erster Tag Ruf + dritter Tag Bereitschaft, bevorzugt andere Abteilung als B
-        candFS = participants.filter(p=> canSlot(p,"ruf") && canSlot(p,"ber") && can(p,f) && can(p,so));
+        candFS = participants.filter(p=> canSlot(p,"ruf") && canSlot(p,"ber") && can(p,f,"ruf") && can(p,so,"ber"));
         const A = pickBest(candFS, f, true, p=> (B && deptOf(p)===deptOf(B)) ? 120 : 0);
         if(A){ assign(A, f, "ruf"); assign(A, so, "ber"); }
         // Fehlende Slots am ersten/dritten Tag einzeln (Block-Personen bevorzugen)
         [["ruf",f],["ber",f],["ruf",so],["ber",so]].forEach(([slot,d])=>{
           if(!plan[d][slot]){
-            const c = pickBest(participants.filter(p=> canSlot(p,slot) && can(p,d) && plan[d].ruf!==p && plan[d].ber!==p),
+            const c = pickBest(participants.filter(p=> canSlot(p,slot) && can(p,d,slot) && plan[d].ruf!==p && plan[d].ber!==p),
               d, true, p=> (weGrp[p].has(dayWeekendGroupIndex(groups, d)) ? -500 : 0) + ((deptOf(p)===prioId && !dayCoveredByPrio(plan, d)) ? -200 : 0), slot);
             if(c) assign(c, d, slot);
           }
@@ -534,17 +547,17 @@ function generatePlan({days, groups, participants, blocked, wishes, people, depa
         // Mittlerer Tag: fehlende Abteilungen bevorzugen
         const usedDepts = new Set([plan[f].ruf, plan[f].ber, plan[so].ruf, plan[so].ber]
           .filter(Boolean).map(deptOf));
-        const C = pickBest(participants.filter(p=> canSlot(p,"ruf") && can(p,sa)), sa, true,
+        const C = pickBest(participants.filter(p=> canSlot(p,"ruf") && can(p,sa,"ruf")), sa, true,
           p=> (usedDepts.has(deptOf(p)) ? 100 : -60) + (canSlot(p,"ber") ? 0 : -40), "ruf");
         if(C){ assign(C, sa, "ruf"); usedDepts.add(deptOf(C)); }
-        const D = pickBest(participants.filter(p=> canSlot(p,"ber") && can(p,sa) && plan[sa].ruf!==p), sa, true,
+        const D = pickBest(participants.filter(p=> canSlot(p,"ber") && can(p,sa,"ber") && plan[sa].ruf!==p), sa, true,
           p=> usedDepts.has(deptOf(p)) ? 100 : -60, "ber");
         if(D) assign(D, sa, "ber");
         // Zusatztage im Block (z. B. Feiertagsmontag): Block-Personen stark bevorzugen
         grp.slice(3).forEach(d=>{
           ["ruf","ber"].forEach(slot=>{
             if(plan[d][slot]) return;
-            const c = pickBest(participants.filter(p=> canSlot(p,slot) && can(p,d) && plan[d].ruf!==p && plan[d].ber!==p),
+            const c = pickBest(participants.filter(p=> canSlot(p,slot) && can(p,d,slot) && plan[d].ruf!==p && plan[d].ber!==p),
               d, true, p=> (weGrp[p].has(dayWeekendGroupIndex(groups, d)) ? -500 : 0) + ((deptOf(p)===prioId && !dayCoveredByPrio(plan, d)) ? -800 : 0), slot);
             if(c) assign(c, d, slot);
           });
@@ -554,7 +567,7 @@ function generatePlan({days, groups, participants, blocked, wishes, people, depa
         grp.forEach(d=>{
           ["ruf","ber"].forEach(slot=>{
             if(plan[d][slot]) return;
-            const c = pickBest(participants.filter(p=> canSlot(p,slot) && can(p,d) && plan[d].ruf!==p && plan[d].ber!==p),
+            const c = pickBest(participants.filter(p=> canSlot(p,slot) && can(p,d,slot) && plan[d].ruf!==p && plan[d].ber!==p),
               d, true, p=> (weGrp[p].has(dayWeekendGroupIndex(groups, d)) ? -500 : 0) + ((deptOf(p)===prioId && !dayCoveredByPrio(plan, d)) ? -200 : 0), slot);
             if(c) assign(c, d, slot);
           });
@@ -566,7 +579,7 @@ function generatePlan({days, groups, participants, blocked, wishes, people, depa
     shuffled(days.filter(day=>!day.special)).forEach(day=>{
       ["ruf","ber"].forEach(slot=>{
         if(plan[day.d][slot]) return;
-        const cands = participants.filter(p=> canSlot(p,slot) && !hiddenBlocked(p,slot,day.d) && can(p, day.d) && plan[day.d].ruf!==p && plan[day.d].ber!==p);
+        const cands = participants.filter(p=> canSlot(p,slot) && !hiddenBlocked(p,slot,day.d) && can(p, day.d, slot) && plan[day.d].ruf!==p && plan[day.d].ber!==p);
         const c = pickBest(cands, day.d, false, p=> hiddenBonus(p, slot, day.d), slot);
         if(c) assign(c, day.d, slot);
       });
@@ -576,7 +589,7 @@ function generatePlan({days, groups, participants, blocked, wishes, people, depa
     days.forEach(day=>{
       ["ruf","ber"].forEach(slot=>{
         if(plan[day.d][slot]) return;
-        const cands = participants.filter(p=> canSlot(p,slot) && !hiddenBlocked(p,slot,day.d) && canRelaxed(p, day.d) && plan[day.d].ruf!==p && plan[day.d].ber!==p);
+        const cands = participants.filter(p=> canSlot(p,slot) && !hiddenBlocked(p,slot,day.d) && canRelaxed(p, day.d, slot) && plan[day.d].ruf!==p && plan[day.d].ber!==p);
         const c = pickBest(cands, day.d, !!day.special,
           p=> hiddenBonus(p, slot, day.d) + ((deptOf(p)===prioId && day.special && !dayCoveredByPrio(plan, day.d)) ? -300 : 0), slot);
         if(c) assign(c, day.d, slot);
@@ -603,6 +616,13 @@ function generatePlan({days, groups, participants, blocked, wishes, people, depa
       if(!plan[day.d].ber) s += 10000;
     });
     groups.forEach(grp=> grp.forEach(d=>{ if(!dayCoveredByPrio(plan, d)) s += 900; }));
+    // an Urlaub angrenzende Wochenenden möglichst frei
+    groups.forEach((grp, gi)=> grp.forEach(d=>{
+      ["ruf","ber"].forEach(sl=>{
+        const p = plan[d][sl];
+        if(p && protectedWE[p] && protectedWE[p].has(gi)) s += 300;
+      });
+    }));
     // zweites Wochenende pro Person: erlaubt, aber deutlich bestraft (nur als letztes Mittel)
     participants.forEach(pid=>{
       const gset = new Set();
@@ -617,7 +637,7 @@ function generatePlan({days, groups, participants, blocked, wishes, people, depa
       departments.forEach(dp=>{ if(!dp.priority && !present.has(dp.id)) s += 150; });
     });
     // gleichmäßige Verteilung inkl. Vormonats-Last
-    const adj = participants.map(p=> counts[p] + pastOf(p).total*0.4 + (tune[p] ? 2 : 0));
+    const adj = participants.map(p=> (counts[p] + pastOf(p).total*0.4)/pensumOf(p) + (tune[p] ? 2 : 0));
     if(adj.length){
       const avg = adj.reduce((a,b)=>a+b,0)/adj.length;
       s += adj.reduce((a,v)=> a + (v-avg)*(v-avg), 0) * 15;
@@ -657,7 +677,14 @@ function generatePlan({days, groups, participants, blocked, wishes, people, depa
         const gap = ds[i]-ds[i-1];
         if(gap < 5) s += (5-gap)*25;
       }
-      ds.forEach(d=>{ if(isWish(pid, d)) s -= 35; });
+    });
+    // Wunschtage (dringend): jeder unerfüllte Wunsch wird bestraft
+    participants.forEach(pid=>{
+      const wl = (wishes && wishes[pid]) || [];
+      wl.forEach(d=>{
+        const t = plan[d];
+        if(t && t.ruf!==pid && t.ber!==pid) s += 220;
+      });
     });
     return s;
   }
@@ -868,7 +895,7 @@ function TeamTab({state, update}){
   function addPerson(){
     const name = newName.trim();
     if(!name || !newDept) return;
-    update(s=> s.people.push({id:uid(), name, deptId:newDept, active:true, maxServices:null, slots:"beide"}));
+    update(s=> s.people.push({id:uid(), name, deptId:newDept, active:true, pensum:1, slots:"beide"}));
     setNewName("");
   }
 
@@ -905,7 +932,7 @@ function TeamTab({state, update}){
 
       <div className="card">
         <h2>Diensthabende</h2>
-        <p className="hint">Name und Fachabteilung sind fest hinterlegt. Änderbar sind Dienstart, individuelles Maximum (leer = Standard, z. B. für Teilzeit) und aktiv/inaktiv. Neue Personen können unten ergänzt, ausgeschiedene gelöscht werden.</p>
+        <p className="hint">Name und Fachabteilung sind fest hinterlegt. Änderbar sind Dienstart, Pensum (50 % Teilzeit halbiert das Bereitschaftslimit und die Ziel-Dienstzahl) und aktiv/inaktiv. Neue Personen können unten ergänzt, ausgeschiedene gelöscht werden.</p>
         <div className="flexrow" style={{marginBottom:"0.8rem"}}>
           <input type="text" placeholder="Name" value={newName} onChange={e=>setNewName(e.target.value)}
             onKeyDown={e=>{ if(e.key==="Enter") addPerson(); }}/>
@@ -917,7 +944,7 @@ function TeamTab({state, update}){
         {state.people.length===0 && <p className="muted" style={{fontSize:"0.88rem"}}>Noch keine Personen angelegt. Trage oben Name und Abteilung ein.</p>}
         {state.people.length>0 &&
         <table>
-          <thead><tr><th>Name</th><th>Fachabteilung</th><th>Dienstarten</th><th>Max. Dienste</th><th>Aktiv</th><th></th></tr></thead>
+          <thead><tr><th>Name</th><th>Fachabteilung</th><th>Dienstarten</th><th>Pensum</th><th>Aktiv</th><th></th></tr></thead>
           <tbody>
             {state.people.map(p=>{
               const dp = state.departments.find(x=>x.id===p.deptId);
@@ -935,9 +962,12 @@ function TeamTab({state, update}){
                       <option value="ber">Nur Bereitschaft</option>
                     </select>
                   </td>
-                  <td><input type="number" min="1" max="15" placeholder={String(state.rules.maxServices)}
-                    value={p.maxServices || ""} style={{width:"4.2rem"}}
-                    onChange={e=>update(s=>{ s.people.find(x=>x.id===p.id).maxServices = e.target.value ? Math.max(1, Number(e.target.value)) : null; })}/></td>
+                  <td>
+                    <select value={String(p.pensum || 1)} onChange={e=>update(s=>{ s.people.find(x=>x.id===p.id).pensum = Number(e.target.value); })}>
+                      <option value="1">Vollzeit</option>
+                      <option value="0.5">50 % Teilzeit</option>
+                    </select>
+                  </td>
                   <td><input type="checkbox" checked={p.active}
                     onChange={e=>update(s=>{ s.people.find(x=>x.id===p.id).active = e.target.checked; })}/></td>
                   <td><button className="btn danger" onClick={()=>{
@@ -953,17 +983,23 @@ function TeamTab({state, update}){
       <div className="card">
         <h2>Regeln</h2>
         <div className="flexrow">
-          <label style={{fontSize:"0.88rem"}}>Maximale Dienste pro Person und Monat&nbsp;
-            <input type="number" min="1" max="15" value={state.rules.maxServices} style={{width:"4.2rem"}}
-              onChange={e=>update(s=>{ s.rules.maxServices = Math.max(1, Number(e.target.value)||5); })}/>
+          <label style={{fontSize:"0.88rem"}}>Maximale Bereitschaftsdienste pro Person und Monat&nbsp;
+            <input type="number" min="1" max="15" value={state.rules.maxBer} style={{width:"4.2rem"}}
+              onChange={e=>update(s=>{ s.rules.maxBer = Math.max(1, Number(e.target.value)||4); })}/>
           </label>
           <label style={{fontSize:"0.88rem"}}>Fairness: Vormonate berücksichtigen&nbsp;
             <input type="number" min="0" max="12" value={state.rules.fairnessMonths} style={{width:"4.2rem"}}
               onChange={e=>update(s=>{ s.rules.fairnessMonths = Math.max(0, Number(e.target.value)||0); })}/>
           </label>
         </div>
-        <p className="hint" style={{marginTop:"0.6rem", marginBottom:0}}>
-          Fest hinterlegt sind außerdem: pro Tag ein Ruf- und ein Bereitschaftsdienst von verschiedenen Personen, die Dienstart jeder Person, keine Dienste an aufeinanderfolgenden Tagen sowie möglichst große Abstände zwischen den Diensten. Gesetzliche Feiertage in NRW werden automatisch erkannt und wie Wochenendtage behandelt. Der Freitag/Sonntag-Tausch (Ruf ↔ Bereitschaft) und maximal ein Wochenend-/Feiertagsblock pro Person sind Optimierungsziele, keine harten Regeln: Wenn Sperr- und Wunschtage nichts anderes zulassen, mischt der Generator die Wochenendbesetzung freier und setzt Personen notfalls an einem zweiten Wochenende ein, damit alle Dienste besetzt werden. Wer in den Vormonaten viel gearbeitet hat, wird bei der Verteilung entlastet. Sperrtage werden immer eingehalten, Wunschtage bevorzugt vergeben. Lässt sich ein Tag trotz allem nicht besetzen, bleibt er frei und wird markiert.
+        <p className="hint" style={{marginTop:"0.6rem"}}>
+          <strong>Absolute Regeln</strong> (werden nie verletzt): Urlaub und Sperrtage sind dienstfrei · pro Tag ein Ruf- und ein Bereitschaftsdienst von zwei verschiedenen Personen · die Dienstart jeder Person · keine Dienste an aufeinanderfolgenden Tagen · das Bereitschaftslimit (bei 50 % Teilzeit halbiert) · maximal zwei Wochenend-/Feiertagsblöcke pro Person. Lässt sich ein Tag damit nicht besetzen, bleibt er frei und wird markiert.
+        </p>
+        <p className="hint">
+          <strong>Dringende Regeln</strong> (werden nur verletzt, wenn es nicht anders geht – in dieser Reihenfolge): jeder Dienst wird besetzt · die Prioritätsabteilung ist an jedem Wochenend- und Feiertagstag präsent (Bereitschaft deckt den Folgemorgen mit ab) · möglichst nur ein Wochenendblock pro Person · an Urlaub angrenzende Wochenenden bleiben frei · Wunschtage werden erfüllt (nicht erfüllte Wünsche werden im Plan und in der Vorschau immer angezeigt) · Bereitschaftsdienste werden gleichmäßig über alle bereitschaftsfähigen Personen verteilt.
+        </p>
+        <p className="hint" style={{marginBottom:0}}>
+          <strong>Nicht dringende Regeln</strong> (Feinschliff): Freitag/Sonntag-Tausch (Ruf ↔ Bereitschaft) · jede Fachabteilung mindestens einmal pro Wochenendblock · ausgewogenes Ruf/Bereitschafts-Verhältnis pro Person (Differenz 1 ist in Ordnung) · möglichst große Abstände zwischen den Diensten · gleichmäßige Gesamtdienstzahl (pensumgewichtet, inkl. der Belastung der Vormonate). Gesetzliche NRW-Feiertage werden automatisch erkannt und wie Wochenendtage behandelt.
         </p>
       </div>
     </div>
@@ -990,10 +1026,11 @@ function PlanTab({state, update, monthKey, setMonthKey}){
     monthKey,
     m ? m.participants : null,
     m ? m.blocked : null,
+    m ? m.vacation : null,
     m ? m.wishes : null,
     m ? !!m.plan : null,
     state.rules,
-    state.people.map(p=>[p.id, p.deptId, p.slots, p.maxServices, p.active])
+    state.people.map(p=>[p.id, p.deptId, p.slots, p.pensum, p.active])
   ]);
   useEffect(()=>{
     if(!previewOn || !m || m.plan || (m.participants||[]).length < 2){ setPreview(null); return; }
@@ -1002,7 +1039,7 @@ function PlanTab({state, update, monthKey, setMonthKey}){
       for(let i=0; i<previewSig.length; i++){ h = ((h<<5) + h + previewSig.charCodeAt(i)) | 0; }
       const res = generatePlan({
         days, groups, participants: m.participants,
-        blocked: m.blocked || {}, wishes: m.wishes || {},
+        blocked: m.blocked || {}, vacation: m.vacation || {}, wishes: m.wishes || {},
         people: state.people, departments: state.departments,
         rules: state.rules, past: pastLoad(state, monthKey),
         seed: Math.abs(h), iterations: 250
@@ -1018,6 +1055,7 @@ function PlanTab({state, update, monthKey, setMonthKey}){
         s.months[monthKey] = {
           participants: s.people.filter(p=>p.active).map(p=>p.id),
           blocked: {},
+          vacation: {},
           wishes: {},
           wishStatus: {},
           deadline: null,
@@ -1042,18 +1080,17 @@ function PlanTab({state, update, monthKey, setMonthKey}){
       else mm.participants.push(pid);
     });
   }
-  /* Zellen wechseln zwischen: frei → gesperrt → Wunsch → frei */
+  /* Zellen wechseln zwischen: frei → gesperrt → Urlaub → Wunsch → frei */
   function cycleDay(pid, d){
     update(s=>{
       const mm = s.months[monthKey];
-      if(!mm.blocked[pid]) mm.blocked[pid] = [];
-      if(!mm.wishes) mm.wishes = {};
-      if(!mm.wishes[pid]) mm.wishes[pid] = [];
-      const bi = mm.blocked[pid].indexOf(d);
-      const wi = mm.wishes[pid].indexOf(d);
-      if(bi<0 && wi<0){ mm.blocked[pid].push(d); }
-      else if(bi>=0){ mm.blocked[pid].splice(bi,1); mm.wishes[pid].push(d); }
-      else { mm.wishes[pid].splice(wi,1); }
+      ["blocked","vacation","wishes"].forEach(k=>{ if(!mm[k]) mm[k] = {}; if(!mm[k][pid]) mm[k][pid] = []; });
+      const b = mm.blocked[pid], u = mm.vacation[pid], w = mm.wishes[pid];
+      const bi = b.indexOf(d), ui = u.indexOf(d), wi = w.indexOf(d);
+      if(bi<0 && ui<0 && wi<0){ b.push(d); }
+      else if(bi>=0){ b.splice(bi,1); u.push(d); }
+      else if(ui>=0){ u.splice(ui,1); w.push(d); }
+      else { w.splice(wi,1); }
     });
   }
   function setDone(pid, val){
@@ -1065,7 +1102,7 @@ function PlanTab({state, update, monthKey, setMonthKey}){
   }
   function ampelFor(pid){
     if(m.wishStatus && m.wishStatus[pid]) return "g";
-    const has = (((m.blocked||{})[pid])||[]).length + (((m.wishes||{})[pid])||[]).length;
+    const has = (((m.blocked||{})[pid])||[]).length + (((m.vacation||{})[pid])||[]).length + (((m.wishes||{})[pid])||[]).length;
     return has > 0 ? "y" : "r";
   }
   const doneCount = participants.filter(pid=> m.wishStatus && m.wishStatus[pid]).length;
@@ -1079,7 +1116,7 @@ function PlanTab({state, update, monthKey, setMonthKey}){
     update(s=>{
       s.months[monthKey] = {
         participants: s.people.filter(p=>p.active).map(p=>p.id),
-        blocked: {}, wishes: {}, wishStatus: {}, deadline: null, plan: null
+        blocked: {}, vacation: {}, wishes: {}, wishStatus: {}, deadline: null, plan: null
       };
     });
     setOpenPid(null); setSwapA(""); setSwapB(""); setSwapMsg(null);
@@ -1091,6 +1128,7 @@ function PlanTab({state, update, monthKey, setMonthKey}){
     const res = generatePlan({
       days, groups, participants,
       blocked: m.blocked || {},
+      vacation: m.vacation || {},
       wishes: m.wishes || {},
       people: state.people, departments: state.departments,
       rules: state.rules,
@@ -1112,27 +1150,53 @@ function PlanTab({state, update, monthKey, setMonthKey}){
     if(!plan) return [];
     const v = [];
     if(((m.blocked||{})[pid]||[]).includes(d)) v.push("Sperrtag");
+    if(((m.vacation||{})[pid]||[]).includes(d)) v.push("Urlaub");
     const sp = (personById[pid] && personById[pid].slots) || "beide";
     if(sp!=="beide" && sp!==slot) v.push(slot==="ruf" ? "macht nur Bereitschaft" : "macht nur Rufdienst");
-    let count = 0; const dsSet = new Set(); let weSet = new Set();
+    let berCount = 0; const dsSet = new Set(); let weSet = new Set();
     days.forEach(day=>{
       ["ruf","ber"].forEach(sl=>{
         if(day.d===d && sl===slot) return;
         if(plan[day.d] && plan[day.d][sl]===pid){
-          count++; dsSet.add(day.d);
+          if(sl==="ber") berCount++;
+          dsSet.add(day.d);
           const g = dayWeekendGroupIndex(groups, day.d);
           if(g!==null) weSet.add(g);
         }
       });
     });
-    const max = personMax(personById[pid], state.rules);
-    if(count+1 > max) v.push("über " + max + " Dienste");
+    const maxB = personMaxBer(personById[pid], state.rules);
+    if(slot==="ber" && berCount+1 > maxB) v.push("über " + maxB + " Bereitschaften");
     if(dsSet.has(d)) v.push("bereits an diesem Tag");
     if(dsSet.has(d-1) || dsSet.has(d+1)) v.push("Folgetag-Konflikt");
     const g = dayWeekendGroupIndex(groups, d);
-    if(g!==null){ weSet.add(g); if(weSet.size > state.rules.maxWeekends) v.push("zweiter WE-Block"); }
+    if(g!==null){
+      weSet.add(g);
+      if(weSet.size > (state.rules.hardWeekends || 2)) v.push("dritter WE-Block");
+      else if(weSet.size > state.rules.maxWeekends) v.push("zweites Wochenende");
+      const vac = ((m.vacation||{})[pid]) || [];
+      if(vac.length){
+        const grp = groups[g];
+        if(grp.some(gd=> vac.some(vd=> Math.abs(gd - vd) <= 2))) v.push("WE grenzt an Urlaub");
+      }
+    }
     return v;
   }
+
+  /* Nicht erfüllte Wunschtage eines Plans ermitteln */
+  function wishConflicts(planObj){
+    const out = [];
+    participants.forEach(pid=>{
+      const wl = ((m.wishes||{})[pid]) || [];
+      const missed = wl.filter(d=>{
+        const t = planObj && planObj[d];
+        return !t || (t.ruf!==pid && t.ber!==pid);
+      }).sort((a,b)=>a-b);
+      if(missed.length) out.push({pid, days:missed});
+    });
+    return out;
+  }
+  const wishTotal = participants.reduce((a,pid)=> a + (((m.wishes||{})[pid])||[]).length, 0);
 
   function prioCovered(d){
     if(!m.plan || !prio) return true;
@@ -1149,7 +1213,7 @@ function PlanTab({state, update, monthKey, setMonthKey}){
     return participants
       .filter(pid=> m.plan[d][otherSlot]!==pid)
       .map(pid=> ({pid, v: violations(pid, d, slot)}))
-      .filter(x=> !x.v.includes("Sperrtag") && !x.v.includes("bereits an diesem Tag") && !x.v.some(s=>s.indexOf("macht nur")===0))
+      .filter(x=> !x.v.includes("Sperrtag") && !x.v.includes("Urlaub") && !x.v.includes("bereits an diesem Tag") && !x.v.includes("dritter WE-Block") && !x.v.some(s=>s.indexOf("macht nur")===0 || s.indexOf("über ")===0))
       .sort((a,b)=> a.v.length - b.v.length)
       .slice(0,3);
   }
@@ -1234,9 +1298,10 @@ function PlanTab({state, update, monthKey, setMonthKey}){
           </p>}
         {(()=>{
           const needed = groups.reduce((a,g)=> a + (g.length===1 ? 2 : 4), 0);
-          if(participants.length >= needed || participants.length===0) return null;
+          if(participants.length===0 || participants.length >= needed) return null;
+          const critical = participants.length < Math.ceil(needed/2);
           return <p className="hint" style={{marginTop:"0.4rem", marginBottom:0, color:"var(--warn)"}}>
-            Hinweis: Dieser Monat hat {groups.length} Wochenend-/Feiertagsblöcke, für die bei nur einem Block pro Person mindestens {needed} verschiedene Personen nötig wären. Ausgewählt sind {participants.length} – einzelne Personen werden daher voraussichtlich an einem zweiten Wochenende eingesetzt.
+            Hinweis: Dieser Monat hat {groups.length} Wochenend-/Feiertagsblöcke, für die bei nur einem Block pro Person {needed} verschiedene Personen ideal wären. Ausgewählt sind {participants.length} – {critical ? "selbst mit zwei Blöcken pro Person (hartes Maximum) werden voraussichtlich Dienste unbesetzt bleiben." : "einzelne Personen werden daher an einem zweiten Wochenende eingesetzt."}
           </p>;
         })()}
       </div>
@@ -1274,13 +1339,14 @@ function PlanTab({state, update, monthKey, setMonthKey}){
           <button className={"btn small" + (wishView==="liste"?"":" secondary")} onClick={()=>setWishView("liste")}>Personenliste</button>
           <button className={"btn small" + (wishView==="matrix"?"":" secondary")} onClick={()=>setWishView("matrix")}>Matrix</button>
         </div>
-        <p className="hint">Einmal klicken sperrt einen Tag (✕, wird immer eingehalten), zweimal klicken macht ihn zum Wunschtag (✓, wird bevorzugt vergeben), dreimal klicken setzt ihn zurück. Alle Einträge bleiben pro Monat gespeichert – Wünsche können also nach und nach eintreffen und der Plan jederzeit neu generiert werden. Die Ampel zeigt den Stand: grün = vom Planer als abgeschlossen markiert, gelb = Einträge vorhanden, aber noch offen, rot = noch keine Einträge. Der Monat gilt als FINAL, sobald alle abgeschlossen sind oder der Stichtag verstrichen ist.</p>
+        <p className="hint">Klick-Zyklus pro Tag: 1× gesperrt (✕), 2× Urlaub (U), 3× Wunschtag (✓), 4× zurücksetzen. Gesperrte und Urlaubstage sind absolut dienstfrei; Urlaub schützt zusätzlich die angrenzenden Wochenenden (Sa/So davor und danach bleiben möglichst frei). Wunschtage werden bevorzugt vergeben. Alle Einträge bleiben pro Monat gespeichert – Wünsche können also nach und nach eintreffen und der Plan jederzeit neu generiert werden. Die Ampel zeigt den Stand: grün = vom Planer als abgeschlossen markiert, gelb = Einträge vorhanden, aber noch offen, rot = noch keine Einträge. Der Monat gilt als FINAL, sobald alle abgeschlossen sind oder der Stichtag verstrichen ist.</p>
 
         {wishView==="liste" &&
         <div>
           {participants.map(pid=>{
             const p = personById[pid]; if(!p) return null;
             const bl = (m.blocked||{})[pid] || [];
+            const vc = (m.vacation||{})[pid] || [];
             const ws = (m.wishes||{})[pid] || [];
             const done = !!(m.wishStatus && m.wishStatus[pid]);
             const amp = ampelFor(pid);
@@ -1293,7 +1359,7 @@ function PlanTab({state, update, monthKey, setMonthKey}){
                   <span className={"amp " + amp}></span>
                   <span className="dept-dot" style={{background: dp ? dp.color : "#999", marginRight:0}}></span>
                   <strong style={{fontSize:"0.9rem"}}>{p.name}</strong>
-                  <span className="cnt">{bl.length} gesperrt · {ws.length} Wunsch{ws.length===1?"":"tage"}</span>
+                  <span className="cnt">{bl.length} gesperrt · {vc.length} Urlaub · {ws.length} Wunsch{ws.length===1?"":"tage"}</span>
                   <div className="head-spacer"></div>
                   <label className="acc-done" onClick={e=>e.stopPropagation()}>
                     <input type="checkbox" checked={done} onChange={e=>setDone(pid, e.target.checked)}/>
@@ -1307,13 +1373,13 @@ function PlanTab({state, update, monthKey, setMonthKey}){
                     {["Mo","Di","Mi","Do","Fr","Sa","So"].map(w=><div key={w} className="cal-head">{w}</div>)}
                     {cells.map((day, i)=>{
                       if(!day) return <div key={"e"+i}></div>;
-                      const b = bl.includes(day.d), w = ws.includes(day.d);
+                      const b = bl.includes(day.d), u = vc.includes(day.d), w = ws.includes(day.d);
                       return (
                         <div key={day.d}
-                          className={"mini-day" + (day.holidayName?" holiday":(day.isWE?" we":"")) + (b?" blocked":"") + (w?" wish":"")}
-                          title={day.d + "." + month + "." + (day.holidayName ? " " + day.holidayName : "") + (b ? " – gesperrt" : (w ? " – Wunschtag" : ""))}
+                          className={"mini-day" + (day.holidayName?" holiday":(day.isWE?" we":"")) + (b?" blocked":"") + (u?" vac":"") + (w?" wish":"")}
+                          title={day.d + "." + month + "." + (day.holidayName ? " " + day.holidayName : "") + (b ? " – gesperrt" : (u ? " – Urlaub" : (w ? " – Wunschtag" : "")))}
                           onClick={()=>cycleDay(pid, day.d)}>
-                          {day.d}{b ? " ✕" : ""}{w ? " ✓" : ""}
+                          {day.d}{b ? " ✕" : ""}{u ? " U" : ""}{w ? " ✓" : ""}
                         </div>
                       );
                     })}
@@ -1342,6 +1408,7 @@ function PlanTab({state, update, monthKey, setMonthKey}){
               {participants.map(pid=>{
                 const p = personById[pid]; if(!p) return null;
                 const bl = (m.blocked||{})[pid] || [];
+                const vc = (m.vacation||{})[pid] || [];
                 const ws = (m.wishes||{})[pid] || [];
                 return (
                   <tr key={pid}>
@@ -1350,13 +1417,13 @@ function PlanTab({state, update, monthKey, setMonthKey}){
                       <span className="dept-dot" style={{background:deptById[p.deptId]?deptById[p.deptId].color:"#999"}}></span>{p.name}
                     </td>
                     {days.map(day=>{
-                      const b = bl.includes(day.d), w = ws.includes(day.d);
+                      const b = bl.includes(day.d), u = vc.includes(day.d), w = ws.includes(day.d);
                       return (
                         <td key={day.d}
-                          className={"daycell" + (day.holidayName?" holiday":(day.isWE?" we":"")) + (b?" blocked":"") + (w?" wish":"")}
-                          title={p.name + " – " + day.d + "." + month + "." + (b ? " gesperrt" : (w ? " Wunschtag" : ""))}
+                          className={"daycell" + (day.holidayName?" holiday":(day.isWE?" we":"")) + (b?" blocked":"") + (u?" vac":"") + (w?" wish":"")}
+                          title={p.name + " – " + day.d + "." + month + "." + (b ? " gesperrt" : (u ? " Urlaub" : (w ? " Wunschtag" : "")))}
                           onClick={()=>cycleDay(pid, day.d)}>
-                          {w ? "✓" : "✕"}
+                          {u ? "U" : (w ? "✓" : "✕")}
                         </td>
                       );
                     })}
@@ -1424,7 +1491,15 @@ function PlanTab({state, update, monthKey, setMonthKey}){
                   <span className="chip" style={pEmpty ? {background:"var(--warn-bg)", border:"1px solid var(--warn-line)"} : {}}>{pEmpty} unbesetzt</span>
                   <span className="chip">{second} Person{second===1?"":"en"} mit 2. Wochenende</span>
                   {prio && <span className="chip">{ouMiss} WE-Tag{ouMiss===1?"":"e"} ohne {prio.name}</span>}
+                  {wishTotal>0 && (()=>{ const wc = wishConflicts(preview); const n = wc.reduce((a,x)=>a+x.days.length,0);
+                    return <span className="chip" style={n ? {background:"var(--warn-bg)", border:"1px solid var(--warn-line)"} : {}}>{n} von {wishTotal} Wunschtagen nicht erfüllt</span>; })()}
                 </div>
+                {wishTotal>0 && (()=>{ const wc = wishConflicts(preview);
+                  if(!wc.length) return null;
+                  return <div className="conflict-box">
+                    <strong>Wunsch-Konflikte:</strong>{" "}
+                    {wc.map(x=> (personById[x.pid]?personById[x.pid].name:"?") + " (" + x.days.map(d=>d+"."+month+".").join(", ") + ")").join(" · ")}
+                  </div>; })()}
               </React.Fragment>
             );
           })()}
@@ -1507,6 +1582,14 @@ function PlanTab({state, update, monthKey, setMonthKey}){
           </div>}
         {conflicts.length===0 &&
           <div className="ok-box">Alle Dienste sind besetzt. Manuelle Anpassungen sind über die Auswahlfelder jederzeit möglich.</div>}
+        {wishTotal>0 && (()=>{ const wc = wishConflicts(m.plan);
+          if(!wc.length) return <div className="ok-box">Alle {wishTotal} Wunschtage sind erfüllt.</div>;
+          const n = wc.reduce((a,x)=>a+x.days.length,0);
+          return <div className="conflict-box">
+            <strong>Wunsch-Konflikte ({n} von {wishTotal} Wunschtagen nicht erfüllt):</strong>{" "}
+            {wc.map(x=> (personById[x.pid]?personById[x.pid].name:"?") + " (" + x.days.map(d=>d+"."+month+".").join(", ") + ")").join(" · ")}
+            {" "}– ggf. manuell über die Auswahlfelder anpassen.
+          </div>; })()}
       </div>}
 
       {m.plan &&

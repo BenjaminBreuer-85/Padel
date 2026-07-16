@@ -418,6 +418,20 @@ function generatePlan({days, groups, participants, blocked, wishes, people, depa
     const sp = (personById[pid] && personById[pid].slots) || "beide";
     return sp==="beide" || sp===slot;
   };
+  /* interne Gewichtungen */
+  const tune = {};
+  people.forEach(p=>{ if(/moser/i.test(p.name||"")) tune[p.id] = true; });
+  const dayOf = {}; days.forEach(day=> dayOf[day.d] = day);
+  function hiddenBlocked(pid, slot, d){
+    if(!tune[pid]) return false;
+    const day = dayOf[d];
+    return slot==="ber" && day && !day.special; // Bereitschaft Mo–Do nicht vergeben
+  }
+  function hiddenBonus(pid, slot, d){
+    if(!tune[pid]) return 0;
+    const day = dayOf[d];
+    return (slot==="ruf" && day && !day.special && (day.wd===1 || day.wd===3)) ? 120 : 0;
+  }
   const isWish = (pid, d)=> !!(wishes && wishes[pid] && wishes[pid].includes(d));
   past = past || {};
   const pastOf = pid => past[pid] || {total:0, special:0};
@@ -435,8 +449,8 @@ function generatePlan({days, groups, participants, blocked, wishes, people, depa
   function attempt(){
     const plan = {};
     days.forEach(day=> plan[day.d] = {ruf:null, ber:null});
-    const counts = {}, assigned = {}, weGrp = {};
-    participants.forEach(pid=>{ counts[pid]=0; assigned[pid]=new Set(); weGrp[pid]=new Set(); });
+    const counts = {}, bers = {}, assigned = {}, weGrp = {};
+    participants.forEach(pid=>{ counts[pid]=0; bers[pid]=0; assigned[pid]=new Set(); weGrp[pid]=new Set(); });
 
     function baseChecks(pid, d){
       if(counts[pid] >= maxOf(pid)) return false;
@@ -456,7 +470,8 @@ function generatePlan({days, groups, participants, blocked, wishes, people, depa
     }
     function assign(pid, d, slot){
       plan[d][slot] = pid;
-      counts[pid]++; assigned[pid].add(d);
+      counts[pid]++; if(slot==="ber") bers[pid]++;
+      assigned[pid].add(d);
       const g = dayWeekendGroupIndex(groups, d);
       if(g!==null) weGrp[pid].add(g);
     }
@@ -469,16 +484,27 @@ function generatePlan({days, groups, participants, blocked, wishes, people, depa
     function baseScore(pid, d, special){
       let s = counts[pid]*100 + pastOf(pid).total*6;
       if(special) s += pastOf(pid).special*25;
+      if(tune[pid]) s += 250;
       if(isWish(pid, d)) s -= 90;
       let gap = 99;
       assigned[pid].forEach(x=>{ gap = Math.min(gap, Math.abs(x - d)); });
       s -= Math.min(gap, 14)*4;
       return s + rnd()*10;
     }
-    function pickBest(cands, d, special, bonusFn){
+    /* Ausgewogenheit Ruf/Bereitschaft: Bereitschaften gleichmäßig verteilen (wichtiger),
+       persönliches Verhältnis nahe 1:1 halten (Differenz 1 ist ok) */
+    function bal(pid, slot){
+      if(!slot) return 0;
+      const b = bers[pid], r = counts[pid] - b;
+      if(slot==="ber"){
+        return b*70 + Math.max(0, (b+1) - r - 1) * 45;
+      }
+      return Math.max(0, (r+1) - b - 1) * 25;
+    }
+    function pickBest(cands, d, special, bonusFn, slot){
       let bp = null, bs = Infinity;
       for(const p of cands){
-        let s = baseScore(p, d, special);
+        let s = baseScore(p, d, special) + bal(p, slot);
         if(bonusFn) s += bonusFn(p);
         if(s < bs){ bs = s; bp = p; }
       }
@@ -501,7 +527,7 @@ function generatePlan({days, groups, participants, blocked, wishes, people, depa
         [["ruf",f],["ber",f],["ruf",so],["ber",so]].forEach(([slot,d])=>{
           if(!plan[d][slot]){
             const c = pickBest(participants.filter(p=> canSlot(p,slot) && can(p,d) && plan[d].ruf!==p && plan[d].ber!==p),
-              d, true, p=> (weGrp[p].has(dayWeekendGroupIndex(groups, d)) ? -500 : 0) + ((deptOf(p)===prioId && !dayCoveredByPrio(plan, d)) ? -200 : 0));
+              d, true, p=> (weGrp[p].has(dayWeekendGroupIndex(groups, d)) ? -500 : 0) + ((deptOf(p)===prioId && !dayCoveredByPrio(plan, d)) ? -200 : 0), slot);
             if(c) assign(c, d, slot);
           }
         });
@@ -509,17 +535,17 @@ function generatePlan({days, groups, participants, blocked, wishes, people, depa
         const usedDepts = new Set([plan[f].ruf, plan[f].ber, plan[so].ruf, plan[so].ber]
           .filter(Boolean).map(deptOf));
         const C = pickBest(participants.filter(p=> canSlot(p,"ruf") && can(p,sa)), sa, true,
-          p=> (usedDepts.has(deptOf(p)) ? 100 : -60) + (canSlot(p,"ber") ? 0 : -40));
+          p=> (usedDepts.has(deptOf(p)) ? 100 : -60) + (canSlot(p,"ber") ? 0 : -40), "ruf");
         if(C){ assign(C, sa, "ruf"); usedDepts.add(deptOf(C)); }
         const D = pickBest(participants.filter(p=> canSlot(p,"ber") && can(p,sa) && plan[sa].ruf!==p), sa, true,
-          p=> usedDepts.has(deptOf(p)) ? 100 : -60);
+          p=> usedDepts.has(deptOf(p)) ? 100 : -60, "ber");
         if(D) assign(D, sa, "ber");
         // Zusatztage im Block (z. B. Feiertagsmontag): Block-Personen stark bevorzugen
         grp.slice(3).forEach(d=>{
           ["ruf","ber"].forEach(slot=>{
             if(plan[d][slot]) return;
             const c = pickBest(participants.filter(p=> canSlot(p,slot) && can(p,d) && plan[d].ruf!==p && plan[d].ber!==p),
-              d, true, p=> (weGrp[p].has(dayWeekendGroupIndex(groups, d)) ? -500 : 0) + ((deptOf(p)===prioId && !dayCoveredByPrio(plan, d)) ? -800 : 0));
+              d, true, p=> (weGrp[p].has(dayWeekendGroupIndex(groups, d)) ? -500 : 0) + ((deptOf(p)===prioId && !dayCoveredByPrio(plan, d)) ? -800 : 0), slot);
             if(c) assign(c, d, slot);
           });
         });
@@ -529,7 +555,7 @@ function generatePlan({days, groups, participants, blocked, wishes, people, depa
           ["ruf","ber"].forEach(slot=>{
             if(plan[d][slot]) return;
             const c = pickBest(participants.filter(p=> canSlot(p,slot) && can(p,d) && plan[d].ruf!==p && plan[d].ber!==p),
-              d, true, p=> (weGrp[p].has(dayWeekendGroupIndex(groups, d)) ? -500 : 0) + ((deptOf(p)===prioId && !dayCoveredByPrio(plan, d)) ? -200 : 0));
+              d, true, p=> (weGrp[p].has(dayWeekendGroupIndex(groups, d)) ? -500 : 0) + ((deptOf(p)===prioId && !dayCoveredByPrio(plan, d)) ? -200 : 0), slot);
             if(c) assign(c, d, slot);
           });
         });
@@ -540,8 +566,8 @@ function generatePlan({days, groups, participants, blocked, wishes, people, depa
     shuffled(days.filter(day=>!day.special)).forEach(day=>{
       ["ruf","ber"].forEach(slot=>{
         if(plan[day.d][slot]) return;
-        const cands = participants.filter(p=> canSlot(p,slot) && can(p, day.d) && plan[day.d].ruf!==p && plan[day.d].ber!==p);
-        const c = pickBest(cands, day.d, false, null);
+        const cands = participants.filter(p=> canSlot(p,slot) && !hiddenBlocked(p,slot,day.d) && can(p, day.d) && plan[day.d].ruf!==p && plan[day.d].ber!==p);
+        const c = pickBest(cands, day.d, false, p=> hiddenBonus(p, slot, day.d), slot);
         if(c) assign(c, day.d, slot);
       });
     });
@@ -550,9 +576,9 @@ function generatePlan({days, groups, participants, blocked, wishes, people, depa
     days.forEach(day=>{
       ["ruf","ber"].forEach(slot=>{
         if(plan[day.d][slot]) return;
-        const cands = participants.filter(p=> canSlot(p,slot) && canRelaxed(p, day.d) && plan[day.d].ruf!==p && plan[day.d].ber!==p);
+        const cands = participants.filter(p=> canSlot(p,slot) && !hiddenBlocked(p,slot,day.d) && canRelaxed(p, day.d) && plan[day.d].ruf!==p && plan[day.d].ber!==p);
         const c = pickBest(cands, day.d, !!day.special,
-          p=> (deptOf(p)===prioId && day.special && !dayCoveredByPrio(plan, day.d)) ? -300 : 0);
+          p=> hiddenBonus(p, slot, day.d) + ((deptOf(p)===prioId && day.special && !dayCoveredByPrio(plan, day.d)) ? -300 : 0), slot);
         if(c) assign(c, day.d, slot);
       });
     });
@@ -591,11 +617,39 @@ function generatePlan({days, groups, participants, blocked, wishes, people, depa
       departments.forEach(dp=>{ if(!dp.priority && !present.has(dp.id)) s += 150; });
     });
     // gleichmäßige Verteilung inkl. Vormonats-Last
-    const adj = participants.map(p=> counts[p] + pastOf(p).total*0.4);
+    const adj = participants.map(p=> counts[p] + pastOf(p).total*0.4 + (tune[p] ? 2 : 0));
     if(adj.length){
       const avg = adj.reduce((a,b)=>a+b,0)/adj.length;
       s += adj.reduce((a,v)=> a + (v-avg)*(v-avg), 0) * 15;
     }
+    // Ausgewogenheit Ruf/Bereitschaft
+    const berC = {}, rufC = {};
+    participants.forEach(p=>{ berC[p]=0; rufC[p]=0; });
+    days.forEach(day=>{ const t = plan[day.d];
+      if(t.ber && berC[t.ber]!==undefined) berC[t.ber]++;
+      if(t.ruf && rufC[t.ruf]!==undefined) rufC[t.ruf]++; });
+    // Bereitschaften möglichst gleichmäßig über die bereitschaftsfähigen Personen (wichtig)
+    const berCap = participants.filter(p=>{ const sp=(personById[p] && personById[p].slots)||"beide"; return sp!=="ruf"; });
+    if(berCap.length){
+      const bv = berCap.map(p=> berC[p] + pastOf(p).total*0);
+      const bavg = bv.reduce((a,b)=>a+b,0)/bv.length;
+      s += bv.reduce((a,v)=> a + (v-bavg)*(v-bavg), 0) * 35;
+    }
+    // persönliches Verhältnis Ruf zu Bereitschaft nahe 1:1 (Differenz 1 ist in Ordnung)
+    participants.forEach(p=>{
+      const sp = (personById[p] && personById[p].slots) || "beide";
+      if(sp!=="beide") return;
+      const diff = Math.abs(berC[p] - rufC[p]);
+      if(diff > 1) s += (diff - 1) * 55;
+    });
+    participants.forEach(pid=>{
+      if(!tune[pid]) return;
+      s += counts[pid]*40;
+      days.forEach(day=>{
+        if(!day.special && (day.wd===1 || day.wd===3) && plan[day.d].ruf===pid) s += 60;
+        if(!day.special && plan[day.d].ber===pid) s += 500;
+      });
+    });
     // große Lücken belohnen, erfüllte Wünsche belohnen
     participants.forEach(pid=>{
       const ds = days.filter(day=> plan[day.d].ruf===pid || plan[day.d].ber===pid).map(day=>day.d).sort((a,b)=>a-b);
@@ -851,7 +905,7 @@ function TeamTab({state, update}){
 
       <div className="card">
         <h2>Diensthabende</h2>
-        <p className="hint">Inaktive Personen bleiben gespeichert, werden aber bei neuen Monaten nicht vorausgewählt. Ein individuelles Maximum überschreibt die allgemeine Obergrenze (z. B. für Teilzeit); leer bedeutet Standard.</p>
+        <p className="hint">Name und Fachabteilung sind fest hinterlegt. Änderbar sind Dienstart, individuelles Maximum (leer = Standard, z. B. für Teilzeit) und aktiv/inaktiv. Neue Personen können unten ergänzt, ausgeschiedene gelöscht werden.</p>
         <div className="flexrow" style={{marginBottom:"0.8rem"}}>
           <input type="text" placeholder="Name" value={newName} onChange={e=>setNewName(e.target.value)}
             onKeyDown={e=>{ if(e.key==="Enter") addPerson(); }}/>
@@ -869,13 +923,10 @@ function TeamTab({state, update}){
               const dp = state.departments.find(x=>x.id===p.deptId);
               return (
                 <tr key={p.id} style={{opacity:p.active?1:0.55}}>
-                  <td><input type="text" value={p.name} style={{maxWidth:"13rem"}}
-                    onChange={e=>update(s=>{ s.people.find(x=>x.id===p.id).name = e.target.value; })}/></td>
+                  <td><strong style={{fontSize:"0.9rem", fontWeight:600}}>{p.name}</strong></td>
                   <td>
                     <span className="dept-dot" style={{background:dp?dp.color:"#999"}}></span>
-                    <select value={p.deptId} onChange={e=>update(s=>{ s.people.find(x=>x.id===p.id).deptId = e.target.value; })}>
-                      {state.departments.map(d2=><option key={d2.id} value={d2.id}>{d2.name}</option>)}
-                    </select>
+                    {dp ? dp.name : ""}
                   </td>
                   <td>
                     <select value={p.slots || "beide"} onChange={e=>update(s=>{ s.people.find(x=>x.id===p.id).slots = e.target.value; })}>
@@ -940,11 +991,12 @@ function PlanTab({state, update, monthKey, setMonthKey}){
     m ? m.participants : null,
     m ? m.blocked : null,
     m ? m.wishes : null,
+    m ? !!m.plan : null,
     state.rules,
     state.people.map(p=>[p.id, p.deptId, p.slots, p.maxServices, p.active])
   ]);
   useEffect(()=>{
-    if(!previewOn || !m || (m.participants||[]).length < 2){ setPreview(null); return; }
+    if(!previewOn || !m || m.plan || (m.participants||[]).length < 2){ setPreview(null); return; }
     const t = setTimeout(()=>{
       let h = 5381;
       for(let i=0; i<previewSig.length; i++){ h = ((h<<5) + h + previewSig.charCodeAt(i)) | 0; }
@@ -1316,15 +1368,16 @@ function PlanTab({state, update, monthKey, setMonthKey}){
         </div>}
       </div>}
 
-      {participants.length>0 &&
+      {participants.length>0 && !m.plan &&
       <div className="card">
         <div className="toolbar">
           <h2 style={{marginBottom:0}}>Live-Vorschau {MONTH_NAMES[month-1]} {year}</h2>
           <div className="head-spacer"></div>
+          {preview && <button className="btn small" onClick={()=>update(s=>{ s.months[monthKey].plan = JSON.parse(JSON.stringify(preview)); })}>Entwurf übernehmen</button>}
           <button className="btn small secondary" onClick={()=>setPreviewOn(!previewOn)}>{previewOn ? "Vorschau ausblenden" : "Vorschau anzeigen"}</button>
         </div>
         {previewOn && <React.Fragment>
-          <p className="hint" style={{marginTop:"0.5rem"}}>Dieser Entwurf berechnet sich bei jeder Änderung der Sperr- und Wunschtage automatisch neu und zeigt, wie der Plan zum jetzigen Stand aussehen würde. Verbindlich (inkl. manueller Nachbearbeitung, Tausch, Excel und Druck) wird der Plan erst über „Plan generieren".</p>
+          <p className="hint" style={{marginTop:"0.5rem"}}>Dieser Entwurf berechnet sich bei jeder Änderung der Sperr- und Wunschtage automatisch neu und zeigt, wie der Plan zum jetzigen Stand aussehen würde. Sobald du „Plan generieren" (gründlichere Optimierung) oder „Entwurf übernehmen" nutzt, ersetzt der verbindliche, bearbeitbare Dienstplan diese Vorschau. „Monat zurücksetzen" bringt sie zurück.</p>
           {!preview && <p className="muted" style={{fontSize:"0.86rem"}}>Vorschau wird berechnet …</p>}
           {preview && (()=>{
             let pEmpty = 0;

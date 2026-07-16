@@ -2,742 +2,1644 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>FNK Padel</title>
-<link rel="manifest" href="data:application/json;base64,eyJuYW1lIjogIkZOSyBQYWRlbCIsICJzaG9ydF9uYW1lIjogIkZOSyBQYWRlbCIsICJkZXNjcmlwdGlvbiI6ICJQYWRlbC1TcGllbCBtaXQgZGVpbmVuIEZyZXVuZGVuIiwgInN0YXJ0X3VybCI6ICIuIiwgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsICJvcmllbnRhdGlvbiI6ICJwb3J0cmFpdCIsICJiYWNrZ3JvdW5kX2NvbG9yIjogIiMxNTY1YzAiLCAidGhlbWVfY29sb3IiOiAiIzE1NjVjMCIsICJpY29ucyI6IFt7InNyYyI6ICJkYXRhOmltYWdlL3BuZztiYXNlNjQsaVZCT1J3MEtHZ29BQUFBTlNVaEVVZ0FBQU1BQUFBREFDQVlBQUFCUzNHd0hBQUFOZjBsRVFWUjRuTzJkYTR4Y1pSM0duNW1kMlpuZGJmZmVsbDFLTDlRQ0xXeXdLQnFwS1EyUkJCTFJRZ3FsRlVRTkpDUWFnMFpwak4vOG9pUkdUYndFVTFFckZzcXkwSkFBS3FKcFZTNlNYbERLcFRlM1hjb1d1anZkKzNidTQ0ZnBiTS9Nbk10N3publBtZG56UHIrRUQ3Tjc1ajNUNWZtOS8vOTdiaE5DbmJEb2diMkZXbjhHNGg4ak96YUdhdjBaQUtCbUg0S0JKMXBxSllTdk8yWG9pUWgreXVENWpoaDY0Z2F2WmZCc2NBYWZ5TVFyRWFRUHl1QVRMNUV0UWxqbVlBdy84UnJaR1pOaUU0TlBhb0dNYXVCNkFDL0MzN1JxdGV3aFNSMXcvc1F4NldPNmxjRFZtMldGbjRGWEUxbEN1SkhBMFJ0bEJKK2hKMXBreU9CRUJOdHZjQk4raHA2STRFWUd1eExZT2dyRThCTS9jSk1WdXhrVnRzVnArQmw4NGdhbjFVQzBFa2c5RDFBSncwL2M0bldHaEN5eE8vc3orTVFMN0ZZRGtTcGdXUUVZZmxJdjJNMldTSFpOQldENFNiMGhXd0pwYXdDR24vaUZ6S3daQ21CbjltZjRpZC9ZeVp4WmxuVUZZUGpKZkVDR0JLNWFJSWFmMUJxM0dhd1NnSmMyazZDaWwyM0hGWUN6UDZrWDNHU3hUQURSMlovaEovV0dhQ1lyTSs3cHBSQ0UxRHUyQmVEc1Qrb1ZKOW1jRTBDay9XSDRTYjBqa2xGdDF0a0NFYVdoQUVScHdnRGJIeElzN0xSQnJBQkVhU2dBVVJvaEFkaitrUG1HYUdaRDdQOUpVQkc1aFpJdEVGRWFDa0NVeGxJQXRqOWt2aUtTWFZZQW9qUVVnQ2dOQlNCS1F3R0kwbEFBb2pRVWdDZ05CU0JLUXdHSTBsQUFvalFVZ0NoTnBOWWZRQ1gyYk40c3ZPM3RBd01lZmhKU2dnSjRpSjNBVzcyWFFuZ0RCYkRKUCs3T1dHNlR5RzZWdmwrdEVKUkJIcFkzeFBCcVVMSFFHK0dGRENVb2dqVldOOFZRQUJQY0JMK1NSSFlyWXRGbHd0dW5Na1BDMjFJRVk2d0U0RkVnQTJTR0h3QzZJay9hMmo0V1hWYjJueGx1MWhxcXd3cWdnMVg0di9iS29uVkd2L3Z0K3BGRFp1K2REbTEzK0ttS1dGVUdWb055MkFMWndDejRacUUzd2t3R0wwV2dCQmVoQUlJWWhkOUo4Q3N4RXNHdEJJQ3hDSlNnQ05jQUxwQVJmcG5qNkdHMFB1QzZRQXdLQVAzWlgzWm85Y1piVUhoRXl0aVV3RG5LQytCSCtNM0dsU21CbmdpVXdCeWxCZkF6L0diank1SUEwSzhHbE1BWXBRV294T3Z3KzdVZlNpQ09zZ0xJUHRIbEZwbFZnSWlqckFDVitEWDcrN1UvVmdFeGxCU2czbWIvRXJLckFDV3dSa2tCS3ZGNzl2ZHp2M1l1d0ZNUkNxQWdyQUlYb1FBS3dDcGdqSElDVlBiL3RXcC9qUGJ2MTlFZ1ZvRWl5Z21nS3F3QytsQUFvalFVSUFDODhmSUJ2UEh5QWN2dEtxc0EyeUFLUUJTSEFnU0FUMzN1RXdBZ1ZBVklPUlNBS0EwRlVBeXVBOHFoQUFHQmJaQXpLQUJSR3VVRTJMQTdXdmJhNmprK1hsTzVmeGxQaWlEaUtDY0FJVm9vQUZFYUNvRGF0VUcxYnIrSW9nSlVyZ1BxQmZiLy9xT2tBSHI0UFJ0ejlxOFBsQldnM3FvQVovL2FvS3dBZXZnMUszdXhuOUlKc05JSk1TS0cwZ0xvVlFHdkpkQWIzOC9adi9KcDBxby9SVnBwQVFCL0phaDErRWsxeWdzQTZIK1JuV3dKdkF3LzJ4L25VQUFUWkVuQUl6NzFDNzhoNWdKN05tODIvU0s3ZXZ1S3BCSjJabjhWKzMrcmI0amhGMlZyS0xWQ2VpSm93MXpMTDhuVHdrdWYzVU1CZEVoa3Q1cFdBNmN0alZjTFhpZXpQeW5DTmNBRkt0c0IyZC93TGp2OGJoZStLclEvSXJBQ21GRDZkbmMzVDJ2ell0YTNHMzdPL3NaUUFBMjNEd3hVM1NQN3lIMG5BV3dCQUd6ZnVVSklCcTlhSFczUDcrYVFKMmYvaTFBQUc1UmsyTDV6aGUvN2RocCt6djdtY0ExUWdYWjIvTm45ZWQxdGlpTDRRK1ZUMzl5R243Ti9PYXdBT3R3K01JQWIvM3lINGUrOXJnQjZoemZ0dGp3TXZ4Z1VRQWV6OEh1SmpPQVRlMUFBbS9qUi83c05QV2QvY1NoQUJXYXovME8vQ1NPVkdmTHNXZnN5Wm51RzN4NFVRSU5WK0V1VVFsWlBYenBoZExTSDRUZUhSNEZjVUMrSEdCbCs1MUNBQzVqTi92dHVlZFl3VExXV2dPRjNCd1dBZGZoTG1Fbmd0d2htKzJUNHhWRmVBTHVIUE0zQzVZY0lWdnRnK08zQlJiQUoydGxmU3lsa1JzL1c5MktSYkNVV2crOE1wU3VBYU90amhGWG9Tck8xazhwZzU3ME12M09VclFCdXcxL0NxaHBva2QwZU1manVVVllBMmRnUlFkYStpSHVVRkVEVzdLK0hOcHd5WldEb3ZVRTVBYndNZnlXVm9iVWpCQVB2RDBvSlVLdXJQRXN3MVBXSDBrZUJ0TWllL2NuOFFCa0IvR3g5eVB4QkNRRVlmbUtFRWdJUVlrVGdCZURzVDh3SXRBQU1QN0Vpc0FMVStwQW5tUjhFVmdBek9QdVRFb0VVZ0swUEVTVndBakQ4eEE2QkU0QVFPd1JLQU03K3hDNkJFWURoSjA0SWhBQTg1RW1jRWdnQnpPRHNUOHlZOXdLdzlTRnVtUGNDR0lXYzRTY2l6SHNCZ0dMWUdYamloRUFJVUtJa0FXVWdvZ1JLQUlEaEovWUluQUNFMklFQ0VLV2hBRVJwS0FCUkdncEFsSVlDRUtXaEFFUnBLQUJSR2dwQWxJWUNFS1doQUVScGxQcCtBRFB1dTY0RlA3aTV6ZmI3RGcybnNlbnhVYUd4OWcybThPWCtoTzQ0UzlzYThNcURTOHArZG1vOGl3Mi9QaXYwV1krT1puSHpZOVhiQXNDYXhWSHMydEtGcnVieStlNkR5Unp1Zm5JVVErTTUzZmVwQUN1QWo5eTRNb2IxeTJPKzd2UGFuaWllMmxvZC9wTmpXV3plcFhiNEFRcmdPOS9iMklxUVQvdTZmbWtqbnRqU2piWjQrZi9tNDRrczdud2lnZUZKdGNNUFVBRGY2YnNraXR2V05IbStuL1hMWTNqOHJpNHNpSlhyOXU3WkRPNTZZaFJucHhsK2dHc0FVOHo2YWpkOFo4TkN2SGdraVd5K0lIMXNBTGhwVlJ5UGJ1cEFMRkllL3YrY3llRGUvZ1Fta25sUDlqc2ZZUVdvQWN2Ykk3aG5YYk1uWTk5NlpSdzc3cWdPLy83VGFXeDdhcFRocjRBQytNU3A4V3paNjIvZXNCQXRqWEpYQTV2V051R1hYK3hFSkZ3KzdxdW5VcmkzUDRIcGxEY1ZaejVEQVh6aWI4ZFRPUGhCZXU1MVYzTVlEMzU2Z2JUeGw3VTM0S2VmNzBCRGhWTjcvNWZDVndiT1lUYkQ4T3ZCTllBSlYzUkhjR3A3citrMlc1NU00UFdobE5CNFA5dzdpYWUvMUQzMyt2N3JGK0FQQjJjd011TytMWWxIcXF2Slg0NGw4ZlhueHBESk1meEdzQUw0eUJ1bjAzajVlSEx1ZFhNMGhJZldML1JrWDRuWlBMNzFQTU52aGFVQTUwOGM4K056S01Nait5YWh6ZVRkMTdiZzhrNzVoYmlyT1l4SE4zWHFWZ1pWRU1rdUs0RFBIQjNONHBtM1p1ZGVSOExBd3h0YVBkblhocFV4L1A3T1RqUkgxWlhBQ3E0QlRQRHFQTUJQL2pXRkw2eHRtcHVkYjcweWpoZU9uSGMxNXRCNERxY25zcmloNGxLTHp5d3JuaEM3YjRCSGdmUUlqK3pZeU9uQlo4NU01ZkM3L1RObFAvdnVCbmRyZ1dTMmdLOE9uTU8rd2VvRitTZVhObUxYbGk2MHhsand0WXpzMkJnUytvdHdIU0NmWDcwK2pYSE5TYW5sN2U2TGNUSmJ3UDNQbk1OZk5RdnRFaC92YWNUdXJWM29hRkpEQXRITXF2SFhxRU1tVTNuODRyVnA2ZU9tY3dVOHVHY01MK3EwVkZjdmlXSzN6cFdoS3NPL1JBM1plV0RHa3lzeXMva0N2dkhjR0o1N3AxcUNxeFpGMGIrdEc0c1hORWpmNzN3a0RCUjdJYXNOMlFiSko1MHI0TWYvblBKazdGd0JlT2o1TWZScmpqaVYrRmhYQkU5djYwSnZhekFsRU1scUtmT3NBRFZtejl1emVIY2s0OG5ZK1FMdzhJdmorT09obWFyZnJlaUk0T2x0M2Jpc0xaZ1NpRUlCYWt5K0FQeG83NlJuNHhjQWZQK2xDVHkydjFxQ3BXME42Ti9XalJVZDZoNE5MMnQ5RmoydzEvSkFjZE9xMWQ1OUdrSmNZcWY5QVJ4VUFLNEZTTDNpSkp0c2dZalNsQWtnZWxhWVZZRFVHNktack15NDR3cEFDVWk5NENhTFZRTHcyaUFTVlBTeTdXb053Q3BBYW8zYkRCck85aUtIUkV1b2NtajBsalVMc2JhbmVMbHh2Z0JNSlhNNGVqYU4xMDdPSXF1NXkyWHh3Z2p1dWI0ZHd4TVo3RDR3WVRwR0twdkg2SFFPUjg2bWNIZzRDZTJUVXJUYmFrbk01TER6MzJOejI3UTJoZEYvY0tKcXU2QmpKL3hHblkzaEdaQ1JIUnREb2hLY1AzRk1HUWxPajJmUWYzQUM0UkN3dEQySzIvcGFFVzBJNGU5SEwxN1kxdGNieDRlVFdmUzBSdEhaMG9Cek16bmRNVUlob0RrYXhyTE9LRDU3ZVF2V0xJbmhtVGNueTU0WFZOcVdsQ01qL0lERXc2Q3F0VVA1QWpBMGxzRTdIeWF4cXJ0eDd1ZVJjQWhYTFluaHRjRlpESTFsME5jVE54eWpVQUJtMG5tOCsyRUsvWWNtY0VsckJPc3VNOTZlRkpHWk5WTUI3QzZJVlpOQWp5c1dOeUtkTGVEa3VUVGVHazVpYlU4TVlZRy80c1Q1SEFZVEdheGU1Ty9EYytjYmRqTm1sV0hMaTBEc3RFS0FPdTFRT0FUMHRrV3g5cEk0M3Z2bzRsMVkxL1RHY2ZoTUVvVUNjSHdraFp1dWFNR3E3aGlPalZnL09tVnNOb2RMSzI2TVdkb2V4YmR2Nmk3NzJlSGhKRjU2VC82OUJQV083UEFEZ3ZjRU81RUFDT2JpdUJUSWZBR1lUdVZ3ZURpSlZ3ZUxseHkzTnpYZzByWW8vdlJPOFJMbmZBRTRmQ2FGdmw0eEFZQmlXNlNGYXdCbm5ZVm85K0xwWllCQnJBWm1nZXpyalNNVUFoNjRvYlBzNTRVQ3NEQWV4cFRGY3prN21odjQ3TTRLdkc2cmhRV3dXd1ZLQkxrYWFBbUhnTFU5TWJ6dzloU09mRlErMjk5MVhSdXU3b25qOWNIcW0xTkt0RFUxWUdWWGRLNmFxSTZiNE50WnU5bzZDdVRtTEhIUUY4Z3J1eG9SajRReG1FaFgvZTdFU0JyWDlCU3JnNVpRQ0dodURPT3FKVEhjdWE0TkgwMWxjZWo5Nmh2YVZjT3Y4QU1PV2lDbmxRQW8vNGNGclNMMDljYngvbGdhNld6MW4rYllTQm8zcm03QnNvNG9nSXZyaUVJQlNGNDRFYlovYUJiLy9hRDhSSmgyV3kyWlhBRS8zNWN3M2Via3VUU2VmZE83RzIxa0kyT0NkREpCdTdydXg2a0lsUVJOQmlLR3JLN0FUV2ZpK3NJM1dSSm9vUkRCeElzMjJPM0ZtMUt1L1BSQ0FrS3NrSEhsc3RSTG55a0M4UU9abCt4THZTV1M5eElRcjVHZE1jOEN5MnBBWk9MVjVPcjVqRTBSaUJ1ODdpcDhiVmtvQXhIQnoxYTZaajA3WlNCYWFyVitySnRGSzRWUWkzbzVZUEoveHVDS1dkU1ZjSWdBQUFBQVNVVk9SSzVDWUlJPSIsICJzaXplcyI6ICIxOTJ4MTkyIiwgInR5cGUiOiAiaW1hZ2UvcG5nIn1dfQ==">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="FNK Padel">
-<link rel="apple-touch-icon" href="data:image/png;base64,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">
-<meta name="theme-color" content="#1565c0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dienstplan Chirurgie</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&display=swap');
-*{margin:0;padding:0;box-sizing:border-box}
-html,body{width:100%;height:100%;overflow:hidden;background:#1a3a5c;font-family:'Outfit',sans-serif;touch-action:none;user-select:none;-webkit-user-select:none}
-canvas{display:block;position:fixed;top:0;left:0}
-#hud{position:fixed;top:0;left:0;right:0;height:64px;display:flex;justify-content:space-between;align-items:center;padding:0 10px;background:linear-gradient(180deg,rgba(0,20,40,0.85),rgba(0,20,40,0.5));z-index:10}
-.hs{display:flex;align-items:center;gap:8px}
-.hs .av{width:48px;height:48px;border-radius:50%;overflow:hidden;border:2px solid rgba(255,255,255,0.5);background:#333}
-.hs .av canvas{width:48px;height:48px;image-rendering:pixelated}
-.hs .info{display:flex;flex-direction:column}
-.hs .name{font-size:10px;color:rgba(255,255,255,0.6);letter-spacing:1px;text-transform:uppercase}
-.hs .pts{font-size:22px;font-weight:900;color:#fff}
-#score-center{position:fixed;top:4px;left:50%;transform:translateX(-50%);z-index:11;text-align:center}
-#score-center .games-display{font-size:20px;font-weight:900;color:#fff;letter-spacing:4px}
-#score-center .set-label{font-size:8px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:2px}
-#jz{position:fixed;bottom:14px;left:14px;width:130px;height:130px;z-index:20}
-#jb{width:130px;height:130px;border-radius:50%;background:rgba(0,0,0,0.25);border:2px solid rgba(255,255,255,0.2);position:relative}
-#jn{width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.25);border:2px solid rgba(255,255,255,0.35);position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
-#hbtn{position:fixed;bottom:32px;right:22px;width:82px;height:82px;border-radius:50%;background:linear-gradient(135deg,#fdd835,#f9a825);border:3px solid rgba(255,255,255,0.5);color:#5d4037;font-size:14px;font-weight:900;cursor:pointer;z-index:20;box-shadow:0 4px 15px rgba(0,0,0,0.3)}
-#hbtn:active{transform:scale(0.9)}
-#lobbtn{position:fixed;bottom:120px;right:30px;width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#81d4fa,#039be5);border:3px solid rgba(255,255,255,0.4);color:#fff;font-size:11px;font-weight:900;cursor:pointer;z-index:20;box-shadow:0 3px 12px rgba(0,0,0,0.25)}
-#lobbtn:active{transform:scale(0.9)}
-.game-ui{display:none}
-#install-hint{position:fixed;bottom:0;left:0;right:0;background:rgba(0,20,40,0.95);color:#fff;padding:16px 20px;z-index:200;display:none;flex-direction:column;align-items:center;gap:8px;border-top:2px solid #42a5f5;font-family:'Outfit',sans-serif}
-#install-hint .ih-title{font-size:14px;font-weight:700;color:#64b5f6}
-#install-hint .ih-text{font-size:12px;color:rgba(255,255,255,0.7);text-align:center;line-height:1.5}
-#install-hint .ih-icon{font-size:22px}
-#install-hint .ih-close{position:absolute;top:8px;right:12px;background:none;border:none;color:rgba(255,255,255,0.5);font-size:18px;cursor:pointer}
+  :root{
+    --ink:#20313A; --ink-soft:#51636D; --paper:#F4F6F5; --card:#FFFFFF;
+    --line:#DCE3E2; --line-soft:#EAEEED;
+    --accent:#2F7061; --accent-soft:#E4EFEC;
+    --wish:#2F7061; --wish-bg:#DDEEE8;
+    --warn:#A8650F; --warn-bg:#FCF2DF; --warn-line:#E8CFA4;
+    --we-bg:#EEF3F1; --holiday-bg:#EDE9F3;
+    --danger:#9C3B31;
+    --radius:10px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{font-size:15px;}
+  body{
+    font-family:'Instrument Sans', system-ui, sans-serif;
+    background:var(--paper); color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+  }
+  .mono{font-family:'Spline Sans Mono', monospace;}
+  button{font-family:inherit; cursor:pointer;}
+  input, select{font-family:inherit; font-size:0.95rem;}
 
-#splash{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;justify-content:center;align-items:center;background:linear-gradient(135deg,#0d47a1,#1565c0,#1e88e5);overflow:hidden}
-#splash .bg-ball{position:absolute;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#eeff41,#aeea00);opacity:0.06;top:-80px;right:-60px}
-#splash .bg-ball2{position:absolute;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#64b5f6,#1e88e5);opacity:0.08;bottom:-40px;left:-40px}
-#splash h1{font-size:42px;font-weight:900;color:#fff;letter-spacing:6px;text-shadow:0 4px 20px rgba(0,0,0,0.3);z-index:1}
-#splash .sub{font-size:14px;color:rgba(255,255,255,0.6);margin-top:4px;letter-spacing:4px;z-index:1}
-#splash .start-btn{margin-top:40px;padding:16px 50px;font-family:inherit;font-size:16px;font-weight:700;background:rgba(255,255,255,0.15);color:#fff;border:2px solid rgba(255,255,255,0.4);border-radius:40px;cursor:pointer;z-index:1;letter-spacing:2px}
-#splash .racket-icon{font-size:60px;margin-bottom:10px;z-index:1}
-.version{position:absolute;bottom:12px;font-size:9px;color:rgba(255,255,255,0.25);letter-spacing:2px}
-#charselect{position:fixed;inset:0;z-index:90;display:none;flex-direction:column;align-items:center;background:linear-gradient(180deg,#0d47a1,#1565c0);padding:16px 10px;overflow-y:auto}
-#charselect h2{font-size:18px;font-weight:900;color:#fff;letter-spacing:3px;margin-bottom:2px}
-#charselect .step-label{font-size:13px;color:#64b5f6;font-weight:700;margin-bottom:4px}
-#charselect .hint{font-size:11px;color:rgba(255,255,255,0.45);margin-bottom:12px}
-.char-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:380px}
-.char-card{background:rgba(255,255,255,0.08);border:2px solid rgba(255,255,255,0.12);border-radius:14px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;transition:all 0.15s}
-.char-card:hover,.char-card.sel{border-color:rgba(255,255,255,0.5);background:rgba(255,255,255,0.15)}
-.char-card.sel-p1{border-color:#42a5f5;background:rgba(66,165,245,0.2)}
-.char-card.sel-p2{border-color:#ef5350;background:rgba(239,83,80,0.2)}
-.char-card.disabled{opacity:0.3;pointer-events:none}
-.char-card .avatar-wrap{width:56px;height:56px;border-radius:50%;overflow:hidden;background:#333;border:2px solid rgba(255,255,255,0.3)}
-.char-card .avatar-wrap canvas{width:56px;height:56px;image-rendering:pixelated}
-.char-card .cname{font-size:12px;font-weight:700;color:#fff}
-.char-card .cdesc{font-size:9px;color:rgba(255,255,255,0.5)}
-.stats{width:100%;display:flex;flex-direction:column;gap:3px}
-.stat-row{display:flex;align-items:center;gap:5px;font-size:8px;color:rgba(255,255,255,0.6)}
-.stat-row .stat-label{width:42px;text-align:right}
-.stat-bar{flex:1;height:5px;background:rgba(255,255,255,0.1);border-radius:3px;overflow:hidden}
-.stat-fill{height:100%;border-radius:3px}
-.stat-spd .stat-fill{background:linear-gradient(90deg,#4fc3f7,#0288d1)}
-.stat-pwr .stat-fill{background:linear-gradient(90deg,#ff8a65,#e53935)}
-.stat-rch .stat-fill{background:linear-gradient(90deg,#81c784,#2e7d32)}
-.stat-sta .stat-fill{background:linear-gradient(90deg,#ffcc80,#ef6c00)}
-#play-btn{margin-top:14px;padding:14px 50px;font-family:inherit;font-size:15px;font-weight:700;background:#43a047;color:#fff;border:none;border-radius:30px;cursor:pointer;letter-spacing:2px;opacity:0.4;pointer-events:none}
-#play-btn.ready{opacity:1;pointer-events:auto}
-#gameover{position:fixed;inset:0;z-index:80;display:none;flex-direction:column;justify-content:center;align-items:center;background:rgba(0,20,40,0.92);gap:12px}
-#gameover h1{font-size:28px;font-weight:900;color:#64b5f6;letter-spacing:3px}
-#gameover p{font-size:16px;color:#90caf9}
-#gameover button{margin-top:10px;padding:14px 40px;font-family:inherit;font-size:15px;font-weight:700;background:#1e88e5;color:#fff;border:none;border-radius:30px;cursor:pointer}
+  header{
+    background:var(--ink); color:#F2F5F4;
+    padding:0.9rem 1.4rem;
+    display:flex; align-items:center; gap:1.2rem; flex-wrap:wrap;
+  }
+  header h1{font-size:1.05rem; font-weight:600; letter-spacing:0.02em;}
+  header h1 span{color:#9BC3B8; font-weight:400;}
+  .head-spacer{flex:1;}
+  .head-btn{
+    background:transparent; color:#C8D5D1; border:1px solid #46585F;
+    border-radius:7px; padding:0.35rem 0.75rem; font-size:0.82rem;
+  }
+  .head-btn:hover{color:#fff; border-color:#7A8D93;}
+
+  nav{
+    background:var(--card); border-bottom:1px solid var(--line);
+    display:flex; padding:0 1.4rem; gap:0.2rem; flex-wrap:wrap;
+  }
+  nav button{
+    background:none; border:none; border-bottom:2.5px solid transparent;
+    padding:0.75rem 1rem; font-size:0.92rem; color:var(--ink-soft); font-weight:500;
+  }
+  nav button.active{color:var(--accent); border-bottom-color:var(--accent); font-weight:600;}
+  nav button:hover{color:var(--ink);}
+
+  main{max-width:1200px; margin:0 auto; padding:1.4rem;}
+
+  .card{
+    background:var(--card); border:1px solid var(--line);
+    border-radius:var(--radius); padding:1.1rem 1.2rem; margin-bottom:1.1rem;
+  }
+  .card h2{font-size:0.95rem; font-weight:600; margin-bottom:0.7rem;}
+  .card .hint{font-size:0.82rem; color:var(--ink-soft); margin-bottom:0.7rem; line-height:1.45;}
+
+  .btn{
+    background:var(--accent); color:#fff; border:none; border-radius:8px;
+    padding:0.5rem 1rem; font-size:0.9rem; font-weight:600;
+  }
+  .btn:hover{filter:brightness(1.07);}
+  .btn:disabled{opacity:0.45; cursor:default;}
+  .btn.secondary{background:var(--card); color:var(--ink); border:1px solid var(--line);}
+  .btn.secondary:hover{border-color:var(--ink-soft); filter:none;}
+  .btn.small{padding:0.3rem 0.65rem; font-size:0.82rem; font-weight:500;}
+  .btn.danger{background:none; border:none; color:var(--danger); font-size:0.82rem; padding:0.2rem 0.4rem;}
+
+  input[type=text], input[type=number], input[type=month], select{
+    border:1px solid var(--line); border-radius:7px; padding:0.42rem 0.6rem;
+    background:#fff; color:var(--ink);
+  }
+  input:focus, select:focus, button:focus-visible{outline:2px solid var(--accent); outline-offset:1px;}
+
+  table{border-collapse:collapse; width:100%;}
+  th{font-size:0.76rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--ink-soft); font-weight:600; text-align:left; padding:0.4rem 0.55rem; border-bottom:1.5px solid var(--line);}
+  td{padding:0.45rem 0.55rem; border-bottom:1px solid var(--line-soft); font-size:0.9rem; vertical-align:middle;}
+
+  .dept-dot{display:inline-block; width:0.7rem; height:0.7rem; border-radius:3px; margin-right:0.45rem; vertical-align:-1px;}
+  .chip{
+    display:inline-flex; align-items:center; gap:0.35rem;
+    font-size:0.82rem; padding:0.15rem 0.5rem; border-radius:6px;
+    background:var(--line-soft);
+  }
+
+  /* ---------- Sperr-/Wunschtage-Matrix ---------- */
+  .matrix-wrap{overflow-x:auto; border:1px solid var(--line); border-radius:8px;}
+  .matrix{border-collapse:collapse;}
+  .matrix th, .matrix td{border:1px solid var(--line-soft); padding:0;}
+  .matrix th{padding:0.3rem 0.4rem; background:#FBFCFC; position:sticky; top:0;}
+  .matrix .pname{
+    position:sticky; left:0; background:var(--card); padding:0.35rem 0.6rem;
+    font-size:0.85rem; white-space:nowrap; z-index:2; border-right:1.5px solid var(--line);
+  }
+  .matrix .daycell{
+    width:2rem; height:2rem; text-align:center; cursor:pointer; user-select:none;
+    font-size:0.72rem; color:transparent; background:#fff;
+  }
+  .matrix .daycell.we{background:var(--we-bg);}
+  .matrix .daycell.holiday{background:var(--holiday-bg);}
+  .matrix .daycell:hover{outline:1.5px solid var(--accent); outline-offset:-1.5px;}
+  .matrix .daycell.blocked{background:var(--ink); color:#fff;}
+  .matrix .daycell.wish{background:var(--wish-bg); color:var(--wish); font-weight:700;}
+  .matrix .dayhead{font-size:0.68rem; text-align:center; min-width:2rem;}
+  .matrix .dayhead.we{background:var(--we-bg);}
+  .matrix .dayhead.holiday{background:var(--holiday-bg);}
+  .matrix .dayhead .wd{display:block; color:var(--ink-soft); font-weight:500;}
+
+  /* ---------- Kalender ---------- */
+  .cal-grid{display:grid; grid-template-columns:repeat(7, 1fr); gap:6px;}
+  .cal-head{font-size:0.72rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--ink-soft); text-align:center; padding-bottom:2px; font-weight:600;}
+  .cal-day{
+    border:1px solid var(--line); border-radius:8px; background:#fff;
+    min-height:6.4rem; padding:0.4rem; display:flex; flex-direction:column; gap:0.3rem;
+  }
+  .cal-day.empty-cell{border:none; background:transparent;}
+  .cal-day.we{background:var(--we-bg); border-color:#CBD8D3;}
+  .cal-day.holiday{background:var(--holiday-bg); border-color:#CFC7DE;}
+  .cal-day.conflict{background:var(--warn-bg); border-color:var(--warn-line);}
+  .cal-daynum{font-size:0.8rem; font-weight:600; display:flex; justify-content:space-between; align-items:center; gap:0.3rem;}
+  .cal-daynum .wetag{font-size:0.6rem; font-weight:600; color:var(--accent); letter-spacing:0.04em; white-space:nowrap;}
+  .cal-daynum .htag{font-size:0.6rem; font-weight:600; color:#6B5A93; letter-spacing:0.02em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .cal-daynum .oudot{font-size:0.62rem; font-weight:600;}
+  .slot{display:flex; flex-direction:column; gap:1px;}
+  .slot-label{font-size:0.6rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--ink-soft); font-weight:600;}
+  .slot select{
+    width:100%; font-size:0.78rem; padding:0.2rem 0.3rem; border-radius:5px;
+    border:1px solid var(--line); background:#fff;
+    border-left-width:4px;
+  }
+  .slot select.unset{border-left-color:var(--warn); background:#FFFDF7; color:var(--warn); font-weight:600;}
+
+  .legend{display:flex; gap:1rem; flex-wrap:wrap; font-size:0.8rem; color:var(--ink-soft); margin-top:0.7rem;}
+  .legend .chip{background:#fff; border:1px solid var(--line);}
+
+  .conflict-box{
+    background:var(--warn-bg); border:1px solid var(--warn-line); border-radius:8px;
+    padding:0.7rem 0.9rem; font-size:0.86rem; color:#6E4508; margin-top:0.9rem; line-height:1.6;
+  }
+  .conflict-box .sugg-btn{
+    background:#fff; border:1px solid var(--warn-line); border-radius:6px;
+    padding:0.12rem 0.5rem; font-size:0.8rem; color:#6E4508; margin:0.1rem 0.15rem;
+  }
+  .conflict-box .sugg-btn:hover{border-color:var(--warn);}
+  .ok-box{
+    background:var(--accent-soft); border:1px solid #C4DCD5; border-radius:8px;
+    padding:0.7rem 0.9rem; font-size:0.86rem; color:#1F5045; margin-top:0.9rem;
+  }
+
+  .toolbar{display:flex; gap:0.6rem; flex-wrap:wrap; align-items:center;}
+  .stat-num{font-family:'Spline Sans Mono', monospace; font-size:0.88rem;}
+  .muted{color:var(--ink-soft);}
+  .flexrow{display:flex; gap:0.6rem; flex-wrap:wrap; align-items:center;}
+
+  .person-check{display:flex; align-items:center; gap:0.5rem; padding:0.3rem 0.55rem; border:1px solid var(--line); border-radius:7px; background:#fff; font-size:0.86rem; cursor:pointer;}
+  .person-check input{accent-color:var(--accent);}
+  .person-check.off{opacity:0.5;}
+
+  /* ---------- Personenliste (Akkordeon) & Ampel ---------- */
+  .amp{display:inline-block; width:0.72rem; height:0.72rem; border-radius:50%; flex:none;}
+  .amp.g{background:#2E9E63;}
+  .amp.y{background:#E0A72E;}
+  .amp.r{background:#C5493A;}
+  .acc{border:1px solid var(--line); border-radius:8px; margin-bottom:0.45rem; background:#fff; overflow:hidden;}
+  .acc-head{display:flex; align-items:center; gap:0.6rem; padding:0.5rem 0.7rem; cursor:pointer; user-select:none; flex-wrap:wrap;}
+  .acc-head:hover{background:var(--line-soft);}
+  .acc-head .cnt{font-size:0.78rem; color:var(--ink-soft);}
+  .acc-done{font-size:0.8rem; display:flex; gap:0.3rem; align-items:center; cursor:pointer; white-space:nowrap;}
+  .acc-done input{accent-color:var(--accent);}
+  .acc-body{padding:0.6rem 0.7rem 0.8rem; border-top:1px solid var(--line-soft); background:#FBFCFC;}
+  .mini-day{
+    min-height:2.4rem; border:1px solid var(--line); border-radius:7px; background:#fff;
+    display:flex; align-items:center; justify-content:center; cursor:pointer; user-select:none;
+    font-family:'Spline Sans Mono', monospace; font-size:0.82rem;
+  }
+  .mini-day.we{background:var(--we-bg);}
+  .mini-day.holiday{background:var(--holiday-bg);}
+  .mini-day:hover{outline:1.5px solid var(--accent); outline-offset:-1.5px;}
+  .mini-day.blocked{background:var(--ink); color:#fff; border-color:var(--ink); font-weight:700;}
+  .mini-day.wish{background:var(--wish-bg); color:var(--wish); font-weight:700;}
+  .final-chip{background:var(--accent-soft); color:#1F5045; font-weight:600; border:1px solid #C4DCD5;}
+
+  /* ---------- Druckansicht ---------- */
+  .print-sheet{display:none;}
+  @media print{
+    header, nav, .no-print{display:none !important;}
+    body{background:#fff;}
+    main{max-width:none; padding:0;}
+    .print-sheet{display:block !important; font-size:10.5pt;}
+    .print-sheet h1{font-size:15pt; margin-bottom:2mm;}
+    .print-sheet .psub{font-size:9pt; color:#444; margin-bottom:4mm;}
+    .print-sheet table{width:100%; border-collapse:collapse;}
+    .print-sheet th, .print-sheet td{border:0.5pt solid #999; padding:1.2mm 2mm; font-size:9.5pt; text-align:left;}
+    .print-sheet th{background:#EDEDED; text-transform:none; letter-spacing:0; color:#000;}
+    .print-sheet tr.pwe td{background:#F0F0F0;}
+    .print-sheet tr.pconf td{background:#FBEED3;}
+    .print-sheet .pfoot{font-size:8pt; color:#555; margin-top:3mm;}
+  }
+
+  @media (max-width:780px){
+    .cal-grid{grid-template-columns:1fr;}
+    .cal-day.empty-cell{display:none;}
+    .cal-head{display:none;}
+    .cal-day{min-height:auto;}
+  }
+  @media (prefers-reduced-motion:no-preference){
+    .cal-day, .btn{transition:background 0.12s ease, border-color 0.12s ease;}
+  }
 </style>
 </head>
 <body>
-<canvas id="gc"></canvas>
-<div id="hud" class="game-ui">
-  <div class="hs"><div class="av" id="av1"></div><div class="info"><div class="name" id="pname1">-</div><div class="pts" id="pts1">0</div></div></div>
-  <div id="score-center"><div class="set-label">SPIELE</div><div class="games-display"><span id="g1">0</span> - <span id="g2">0</span></div></div>
-  <div class="hs" style="flex-direction:row-reverse;text-align:right"><div class="av" id="av2"></div><div class="info" style="align-items:flex-end"><div class="name" id="pname2">-</div><div class="pts" id="pts2">0</div></div></div>
-</div>
-<div id="jz" class="game-ui"><div id="jb"><div id="jn"></div></div></div>
-<button id="hbtn" class="game-ui">HIT</button>
-<button id="lobbtn" class="game-ui">LOB</button>
-<div id="splash"><div class="bg-ball"></div><div class="bg-ball2"></div><div class="racket-icon">🎾</div><h1>FNK PADEL</h1><button class="start-btn" id="splash-btn">START</button><div class="version">v1.2</div></div>
-<div id="charselect"><h2 id="step-label">Wähle deinen Spieler</h2><div class="hint" id="step-hint"></div><div class="char-grid" id="cgrid"></div><button id="play-btn">LOS GEHT'S</button></div>
-<div id="gameover"><h1 id="go-title">GEWONNEN!</h1><p id="go-score">6 - 3</p><button id="go-btn">NOCHMAL</button></div>
+<div id="root"></div>
+<script type="text/babel" data-presets="env,react">
+const {useState, useEffect, useMemo, useRef} = React;
 
-<script>
-(function(){
-var CHAR_IMGS={
-  toni:'data:image/jpeg;base64,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',
-  chef:'data:image/jpeg;base64,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',
-  istvan:'data:image/jpeg;base64,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',
-  edith:'data:image/jpeg;base64,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',
-  ben:'data:image/jpeg;base64,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'
-};
-var CHARS=[
-  {id:'toni',name:'Toni',hair:'#5d4037',skin:'#f5d0a0',shirt:'#222',trim:'#444',shorts:'#fff',speed:0.7,power:0.85,reach:0.7,stamina:0.8,desc:'Allrounder'},
-  {id:'chef',name:'Chef',hair:'#b0a090',skin:'#f5d0a0',shirt:'#eee',trim:'#ccc',shorts:'#fff',speed:0.6,power:0.9,reach:0.8,stamina:0.7,desc:'Langsam & Power'},
-  {id:'istvan',name:'Istvan',hair:'#212121',skin:'#d4a574',shirt:'#2e7d32',trim:'#1b5e20',shorts:'#fff',speed:0.6,power:1.0,reach:1.0,stamina:0.4,desc:'Power & Reichweite'},
-  {id:'edith',name:'Edith',hair:'#5d4037',skin:'#f5d0a0',shirt:'#e53935',trim:'#b71c1c',shorts:'#fff',speed:0.6,power:0.7,reach:0.7,stamina:0.9,desc:'Ausdauer-Typ'},
-  {id:'ben',name:'Ben',hair:'#8d6e63',skin:'#f5d0a0',shirt:'#1e88e5',trim:'#0d47a1',shorts:'#fff',speed:0.7,power:0.8,reach:0.9,stamina:0.7,desc:'Vielseitig'},
-];
+/* =====================  Konstanten & Hilfsfunktionen  ===================== */
 
-function drawAvatar(ch,size){
-  var cv=document.createElement('canvas');cv.width=size;cv.height=size;
-  var x=cv.getContext('2d');
-  if(preloadedImgs[ch.id]){
-    x.drawImage(preloadedImgs[ch.id],0,0,size,size);
-  } else if(CHAR_IMGS[ch.id]){
-    var img=new Image();img.src=CHAR_IMGS[ch.id];
-    img.onload=function(){x.drawImage(img,0,0,size,size);preloadedImgs[ch.id]=img;};
-  } else {
-    var s=size/48;x.fillStyle=ch.shirt;x.beginPath();x.arc(24*s,24*s,20*s,0,Math.PI*2);x.fill();
+const STORAGE_KEY = "dienstplan-chirurgie-v3";
+const WD_SHORT = ["So","Mo","Di","Mi","Do","Fr","Sa"];
+const MONTH_NAMES = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
+const DEPT_COLORS = ["#2F7061","#3F6E92","#8A5784","#B07C2A","#5E7B3B","#A85252"];
+
+function uid(){ return Math.random().toString(36).slice(2,10); }
+
+function defaultState(){
+  const D = {ou:"ou", tho:"tho", ach:"ach", kin:"kin", pla:"pla"};
+  const P = (name, deptId, slots)=>({id:uid(), name, deptId, active:true, maxServices:null, slots: slots||"beide"});
+  return {
+    departments: [
+      {id:D.ou, name:"Orthopädie / Unfallchirurgie", color:DEPT_COLORS[0], priority:true},
+      {id:D.tho, name:"Thoraxchirurgie", color:DEPT_COLORS[1], priority:false},
+      {id:D.ach, name:"Allgemeinchirurgie", color:DEPT_COLORS[2], priority:false},
+      {id:D.kin, name:"Kinderchirurgie", color:DEPT_COLORS[3], priority:false},
+      {id:D.pla, name:"Plastische Chirurgie", color:DEPT_COLORS[4], priority:false},
+    ],
+    people: [
+      P("Istvan Benedek", D.ou),
+      P("Antonia Moser", D.ou),
+      P("Jona Bäcker", D.ou, "ruf"),
+      P("Sara Fell", D.ou),
+      P("Vladimir Mitrovic", D.ou),
+      P("Daniel Pliev", D.ou, "ruf"),
+      P("Marcel Rohde", D.ou),
+      P("Alice Soprani", D.ou),
+      P("Merve Deniz", D.tho),
+      P("Seyran Duran", D.tho),
+      P("Maria Camilla Vedovelli", D.tho),
+      P("Jung Koh", D.tho),
+      P("Clara Hülser", D.ach),
+      P("Fenny Tanjaya", D.ach),
+      P("Larissa Wahlefeld", D.ach),
+      P("Laura Contreras Henk", D.kin),
+      P("Rebecca Kastl", D.kin),
+      P("Bianca Heusch", D.pla),
+      P("Alexander Schroeder-Finckh", D.pla),
+      P("Charlotte Weinmann", D.pla),
+    ],
+    rules: { maxServices:5, maxWeekends:1, fairnessMonths:3 },
+    months: {}
+  };
+}
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){ const s = JSON.parse(raw); if(s && s.departments && s.people){
+      if(!s.rules.fairnessMonths) s.rules.fairnessMonths = 3;
+      s.people.forEach(p=>{ if(!p.slots) p.slots = "beide"; });
+      return s;
+    }}
+    // Migration von v2: nur übernehmen, wenn dort bereits Personen angelegt wurden
+    const old = localStorage.getItem("dienstplan-chirurgie-v2");
+    if(old){ const s = JSON.parse(old);
+      if(s && s.departments && s.people && s.people.length){
+        if(!s.rules.fairnessMonths) s.rules.fairnessMonths = 3;
+        s.people.forEach(p=>{ if(!p.slots) p.slots = "beide"; });
+        return s;
+      } }
+  }catch(e){}
+  return defaultState();
+}
+
+function defaultMonthKey(){
+  const now = new Date();
+  const t = new Date(now.getFullYear(), now.getMonth()+2, 1); // übernächster Monat
+  return t.getFullYear() + "-" + String(t.getMonth()+1).padStart(2,"0");
+}
+
+function parseMonthKey(key){
+  const [y,m] = key.split("-").map(Number);
+  return {year:y, month:m};
+}
+
+/* ---------- Feiertage NRW ---------- */
+
+function easterSunday(y){
+  const a=y%19, b=Math.floor(y/100), c=y%100, d=Math.floor(b/4), e=b%4,
+        f=Math.floor((b+8)/25), g=Math.floor((b-f+1)/3), h=(19*a+b-d-g+15)%30,
+        i=Math.floor(c/4), k=c%4, l=(32+2*e+2*i-h-k)%7,
+        m2=Math.floor((a+11*h+22*l)/451),
+        mo=Math.floor((h+l-7*m2+114)/31), da=((h+l-7*m2+114)%31)+1;
+  return new Date(y, mo-1, da);
+}
+
+function nrwHolidays(year){
+  const map = {};
+  const put = (dt, name)=>{ map[(dt.getMonth()+1)+"-"+dt.getDate()] = name; };
+  put(new Date(year,0,1), "Neujahr");
+  put(new Date(year,4,1), "Tag der Arbeit");
+  put(new Date(year,9,3), "Tag der Dt. Einheit");
+  put(new Date(year,10,1), "Allerheiligen");
+  put(new Date(year,11,25), "1. Weihnachtstag");
+  put(new Date(year,11,26), "2. Weihnachtstag");
+  const easter = easterSunday(year);
+  const off = (n)=>{ const d = new Date(easter); d.setDate(d.getDate()+n); return d; };
+  put(off(-2), "Karfreitag");
+  put(off(1), "Ostermontag");
+  put(off(39), "Christi Himmelfahrt");
+  put(off(50), "Pfingstmontag");
+  put(off(60), "Fronleichnam");
+  return map;
+}
+
+function buildDays(year, month){
+  const hol = nrwHolidays(year);
+  const n = new Date(year, month, 0).getDate();
+  const days = [];
+  for(let d=1; d<=n; d++){
+    const wd = new Date(year, month-1, d).getDay();
+    const isWE = wd===5 || wd===6 || wd===0;
+    const holidayName = hol[month+"-"+d] || null;
+    days.push({d, wd, isWE, holidayName, special: isWE || !!holidayName});
   }
-  return cv;
+  return days;
 }
-// Preload all character images
-var preloadedImgs={};
-Object.keys(CHAR_IMGS).forEach(function(id){
-  var img=new Image();img.src=CHAR_IMGS[id];
-  img.onload=function(){preloadedImgs[id]=img;};
-});
 
-// ====== SOUND SYSTEM (Web Audio API) ======
-var audioCtx=null;
-function initAudio(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();}
-function playTone(freq,dur,type,vol){
-  if(!audioCtx)return;
-  var o=audioCtx.createOscillator(),g=audioCtx.createGain();
-  o.type=type||'sine';o.frequency.value=freq;
-  g.gain.setValueAtTime(vol||0.15,audioCtx.currentTime);
-  g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+dur);
-  o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+dur);
+/* "Wochenendgruppen" = zusammenhängende Blöcke aus Fr/Sa/So und Feiertagen */
+function weekendGroups(days){
+  const groups = [];
+  let cur = null;
+  for(const day of days){
+    if(day.special){
+      if(!cur) cur = [];
+      cur.push(day.d);
+    }else{
+      if(cur){ groups.push(cur); cur = null; }
+    }
+  }
+  if(cur) groups.push(cur);
+  return groups;
 }
-function sndHit(){playTone(600,0.08,'square',0.12);setTimeout(function(){playTone(800,0.05,'square',0.08);},30);}
-function sndServe(){playTone(400,0.1,'triangle',0.1);playTone(500,0.08,'triangle',0.08);}
-function sndPoint(){playTone(523,0.15,'sine',0.15);setTimeout(function(){playTone(659,0.15,'sine',0.15);},120);setTimeout(function(){playTone(784,0.25,'sine',0.15);},240);}
-function sndGameWon(){playTone(523,0.12,'sine',0.18);setTimeout(function(){playTone(659,0.12,'sine',0.18);},100);setTimeout(function(){playTone(784,0.12,'sine',0.18);},200);setTimeout(function(){playTone(1047,0.4,'sine',0.2);},300);}
-function sndFault(){playTone(200,0.3,'sawtooth',0.1);}
-function sndBounce(){playTone(900,0.04,'sine',0.06);}
 
-// ====== SCREENS ======
-var splash=document.getElementById('splash'),charsel=document.getElementById('charselect'),gameover=document.getElementById('gameover');
-var cgrid=document.getElementById('cgrid'),playBtn=document.getElementById('play-btn');
-var stepLabel=document.getElementById('step-label'),stepHint=document.getElementById('step-hint');
-var chosenP1=null,chosenP2=null,selectStep=1;
+function dayWeekendGroupIndex(groups, d){
+  for(let i=0;i<groups.length;i++){ if(groups[i].includes(d)) return i; }
+  return null;
+}
 
-document.getElementById('splash-btn').addEventListener('click',function(){initAudio();splash.style.display='none';charsel.style.display='flex';selectStep=1;chosenP1=null;chosenP2=null;buildCharGrid();});
+function personMax(person, rules){
+  return (person && person.maxServices) ? person.maxServices : rules.maxServices;
+}
 
-function buildCharGrid(){
-  cgrid.innerHTML='';
-  stepLabel.textContent=selectStep===1?'Wähle deinen Spieler':'Wähle deinen Gegner';
-  stepHint.textContent='';
-  playBtn.classList.remove('ready');
-  CHARS.forEach(function(ch){
-    var card=document.createElement('div');card.className='char-card';
-    if(selectStep===2&&chosenP1&&ch.id===chosenP1.id)card.className+=' disabled';
-    var awrap=document.createElement('div');awrap.className='avatar-wrap';
-    if(CHAR_IMGS[ch.id]){var aimg=document.createElement('img');aimg.src=CHAR_IMGS[ch.id];aimg.style.cssText='width:56px;height:56px;border-radius:50%;object-fit:cover';awrap.appendChild(aimg);}
-    else awrap.appendChild(drawAvatar(ch,128));
-    var nm=document.createElement('div');nm.className='cname';nm.textContent=ch.name;
-    var desc=document.createElement('div');desc.className='cdesc';desc.textContent=ch.desc;
-    var stats=document.createElement('div');stats.className='stats';
-    stats.innerHTML='<div class="stat-row stat-spd"><span class="stat-label">Speed</span><div class="stat-bar"><div class="stat-fill" style="width:'+Math.round(ch.speed*100)+'%"></div></div></div><div class="stat-row stat-pwr"><span class="stat-label">Power</span><div class="stat-bar"><div class="stat-fill" style="width:'+Math.round(ch.power*100)+'%"></div></div></div><div class="stat-row stat-rch"><span class="stat-label">Reach</span><div class="stat-bar"><div class="stat-fill" style="width:'+Math.round(ch.reach*100)+'%"></div></div></div><div class="stat-row stat-sta"><span class="stat-label">Ausdauer</span><div class="stat-bar"><div class="stat-fill" style="width:'+Math.round(ch.stamina*100)+'%"></div></div></div>';
-    card.appendChild(awrap);card.appendChild(nm);card.appendChild(desc);card.appendChild(stats);cgrid.appendChild(card);
-    card.addEventListener('click',function(){
-      if(selectStep===2&&chosenP1&&ch.id===chosenP1.id)return;
-      var all=cgrid.querySelectorAll('.char-card');for(var i=0;i<all.length;i++){all[i].classList.remove('sel','sel-p1','sel-p2');}
-      card.classList.add('sel',selectStep===1?'sel-p1':'sel-p2');
-      if(selectStep===1)chosenP1=ch;else chosenP2=ch;
-      playBtn.classList.add('ready');playBtn.textContent=selectStep===1?'WEITER →':"LOS GEHT'S";
+/* Belastung der Vormonate für die faire Verteilung */
+function pastLoad(state, monthKey){
+  const load = {};
+  state.people.forEach(p=> load[p.id] = {total:0, special:0});
+  const keys = Object.keys(state.months)
+    .filter(k=> k < monthKey && state.months[k] && state.months[k].plan)
+    .sort().reverse().slice(0, state.rules.fairnessMonths || 3);
+  keys.forEach(k=>{
+    const {year, month} = parseMonthKey(k);
+    const days = buildDays(year, month);
+    const plan = state.months[k].plan;
+    days.forEach(day=>{
+      const t = plan[day.d]; if(!t) return;
+      [t.ruf, t.ber].forEach(pid=>{
+        if(pid && load[pid]){ load[pid].total++; if(day.special) load[pid].special++; }
+      });
     });
   });
+  return load;
 }
-playBtn.addEventListener('click',function(){if(selectStep===1&&chosenP1){selectStep=2;buildCharGrid();}else if(selectStep===2&&chosenP2){charsel.style.display='none';startMatch();}});
-document.getElementById('go-btn').addEventListener('click',function(){gameover.style.display='none';charsel.style.display='flex';selectStep=1;chosenP1=null;chosenP2=null;buildCharGrid();});
 
-// ====== CANVAS ======
-var cv=document.getElementById('gc'),c=cv.getContext('2d'),CW,CH,HUD=64;
-function resize(){CW=window.innerWidth;CH=window.innerHeight;cv.width=CW;cv.height=CH;}
-resize();window.addEventListener('resize',resize);
+/* =====================  Plan-Generator  ===================== */
 
-// ====== JOYSTICK ======
-var jb2=document.getElementById('jb'),jn2=document.getElementById('jn'),jxv=0,jyv=0,jact=false;
-function jm(tx,ty){var r=jb2.getBoundingClientRect();var dx=tx-(r.left+r.width/2),dy=ty-(r.top+r.height/2);var d=Math.min(Math.sqrt(dx*dx+dy*dy),38);var a=Math.atan2(dy,dx);var mx=Math.cos(a)*d,my=Math.sin(a)*d;jn2.style.transform='translate(calc(-50% + '+mx+'px),calc(-50% + '+my+'px))';jxv=mx/38;jyv=my/38;}
-jb2.addEventListener('touchstart',function(e){e.preventDefault();jact=true;jm(e.touches[0].clientX,e.touches[0].clientY);});
-jb2.addEventListener('touchmove',function(e){e.preventDefault();if(jact)jm(e.touches[0].clientX,e.touches[0].clientY);});
-jb2.addEventListener('touchend',function(){jact=false;jn2.style.transform='translate(-50%,-50%)';jxv=0;jyv=0;});
-jb2.addEventListener('mousedown',function(e){jact=true;jm(e.clientX,e.clientY);});
-window.addEventListener('mousemove',function(e){if(jact)jm(e.clientX,e.clientY);});
-window.addEventListener('mouseup',function(){if(jact){jact=false;jn2.style.transform='translate(-50%,-50%)';jxv=0;jyv=0;}});
-var keys={};document.addEventListener('keydown',function(e){keys[e.code]=true;if(e.code==='Space')e.preventDefault();});document.addEventListener('keyup',function(e){keys[e.code]=false;});
-var hitOn=false,lobOn=false,hbtn=document.getElementById('hbtn');
-hbtn.addEventListener('touchstart',function(e){e.preventDefault();hitOn=true;});hbtn.addEventListener('touchend',function(e){e.preventDefault();hitOn=false;});
-hbtn.addEventListener('mousedown',function(){hitOn=true;});hbtn.addEventListener('mouseup',function(){hitOn=false;});
-var lbtn=document.getElementById('lobbtn');
-lbtn.addEventListener('touchstart',function(e){e.preventDefault();lobOn=true;});lbtn.addEventListener('touchend',function(e){e.preventDefault();lobOn=false;});
-lbtn.addEventListener('mousedown',function(){lobOn=true;});lbtn.addEventListener('mouseup',function(){lobOn=false;});
+function generatePlan({days, groups, participants, blocked, wishes, people, departments, rules, past}){
+  const prioDept = departments.find(dp=>dp.priority);
+  const prioId = prioDept ? prioDept.id : null;
+  const personById = {}; people.forEach(p=>personById[p.id]=p);
+  const deptOf = pid => personById[pid] ? personById[pid].deptId : null;
+  const maxOf = pid => personMax(personById[pid], rules);
+  const canSlot = (pid, slot)=>{
+    const sp = (personById[pid] && personById[pid].slots) || "beide";
+    return sp==="beide" || sp===slot;
+  };
+  const isWish = (pid, d)=> !!(wishes && wishes[pid] && wishes[pid].includes(d));
+  past = past || {};
+  const pastOf = pid => past[pid] || {total:0, special:0};
 
-// ====== SCORING ======
-var PNAMES=['0','15','30','40'],gamesP=0,gamesC=0,pointsP=0,pointsC=0,advantage=null;
-function pointStr(pts,other,adv,who){if(pts>=3&&other>=3){if(adv===who)return'AD';if(adv!==null)return'-';return'40';}return PNAMES[Math.min(pts,3)];}
-function updateScoreUI(){document.getElementById('pts1').textContent=pointStr(pointsP,pointsC,advantage,'p');document.getElementById('pts2').textContent=pointStr(pointsC,pointsP,advantage,'c');document.getElementById('g1').textContent=gamesP;document.getElementById('g2').textContent=gamesC;}
+  let best = null, bestScore = Infinity;
+  const ITER = 800;
 
-function awardPoint(who){
-  if(who==='p')pointsP++;else pointsC++;
-  var pp=pointsP,pc=pointsC;
-  if(pp>=4||pc>=4){
-    if(pp>=3&&pc>=3){if(pp===pc){advantage=null;}else if(pp>pc){if(advantage==='p'){winGame('p');return;}else{advantage='p';pointsP=3;pointsC=3;}}else{if(advantage==='c'){winGame('c');return;}else{advantage='c';pointsP=3;pointsC=3;}}}
-    else{if(pp>=4){winGame('p');return;}if(pc>=4){winGame('c');return;}}
+  for(let iter=0; iter<ITER; iter++){
+    const res = attempt();
+    const sc = scorePlan(res);
+    if(sc < bestScore){ bestScore = sc; best = res; }
   }
-  updateScoreUI();resetPoint(gameServer);
-}
+  return best;
 
-function winGame(who){
-  if(who==='p')gamesP++;else gamesC++;
-  pointsP=0;pointsC=0;advantage=null;updateScoreUI();
-  // Alternate server each game
-  gameServer=(gameServer==='p')?'c':'p';
-  // Start celebration
-  celebWinner=who;celebTimer=260;celebTears=[];sndGameWon();
-  for(var i=0;i<8;i++)celebTears.push({x:0,y:0,vy:0.3+Math.random()*0.8,vx:(Math.random()-0.5)*0.6,delay:Math.floor(Math.random()*60),age:0});
-  playing=false;
-  if(gamesP>=6||gamesC>=6){
-    setTimeout(function(){celebTimer=0;winMatch(who);},4500);
-  } else {
-    setTimeout(function(){celebTimer=0;resetPoint(gameServer);},4500);
-  }
-}
+  function attempt(){
+    const plan = {};
+    days.forEach(day=> plan[day.d] = {ruf:null, ber:null});
+    const counts = {}, assigned = {}, weGrp = {};
+    participants.forEach(pid=>{ counts[pid]=0; assigned[pid]=new Set(); weGrp[pid]=new Set(); });
 
-function winMatch(who){
-  playing=false;hideGameUI();
-  setTimeout(function(){
-    document.getElementById('go-title').textContent=who==='p'?'GEWONNEN! 🏆':'VERLOREN!';
-    document.getElementById('go-score').textContent=gamesP+' - '+gamesC+' Spiele';
-    gameover.style.display='flex';
-  },300);
-}
-
-// ====== GAME STATE ======
-var playerChar,cpuChar,ppx,ppy,cpx,cpy,bx,by,bvx,bvy,bOn;
-var ballZ=0,ballVZ=0; // ball height
-var ballSpin=0; // horizontal curve
-var wallBounced=false; // back wall bounce used this rally
-var serving,sOwner,lastH,hcP,hcC,swP,swC,ticks,playing=false;
-var particles=[],celebWinner=null,celebTimer=0,celebTears=[];
-var cpuReactDelay=0,cpuMissChance=0;
-var serveSide=0,gameServer='p';
-var matchPointMsg='',matchPointTimer=0;
-var perfectHit=0;
-var sweatParts=[];
-var cpuServeTimer=0; // frame counter for CPU serve delay
-var CL,CR,CT,CB,NY;
-function calcCourt(){var cw=Math.min(CW-20,400);CL=(CW-cw)/2;CR=CL+cw;CT=HUD+10;CB=CH-10;NY=CT+(CB-CT)*0.48;}
-
-function showGameUI(){document.getElementById('hud').style.display='flex';document.getElementById('jz').style.display='block';document.getElementById('hbtn').style.display='block';document.getElementById('lobbtn').style.display='block';}
-function hideGameUI(){var els=document.querySelectorAll('.game-ui');for(var i=0;i<els.length;i++)els[i].style.display='none';}
-
-function startMatch(){
-  playerChar=chosenP1;cpuChar=chosenP2;
-  var a1=document.getElementById('av1');a1.innerHTML='';
-  if(CHAR_IMGS[playerChar.id]){var i1=document.createElement('img');i1.src=CHAR_IMGS[playerChar.id];i1.style.cssText='width:48px;height:48px;border-radius:50%;object-fit:cover';a1.appendChild(i1);}
-  else a1.appendChild(drawAvatar(playerChar,96));
-  document.getElementById('pname1').textContent=playerChar.name;
-  var a2=document.getElementById('av2');a2.innerHTML='';
-  if(CHAR_IMGS[cpuChar.id]){var i2=document.createElement('img');i2.src=CHAR_IMGS[cpuChar.id];i2.style.cssText='width:48px;height:48px;border-radius:50%;object-fit:cover';a2.appendChild(i2);}
-  else a2.appendChild(drawAvatar(cpuChar,96));
-  document.getElementById('pname2').textContent=cpuChar.name;
-  gamesP=0;gamesC=0;pointsP=0;pointsC=0;advantage=null;celebTimer=0;
-  gameServer='p';serveSide=0;
-  updateScoreUI();showGameUI();resetPoint(gameServer);
-}
-
-function checkMatchPoint(){
-  var pp=pointsP,pc=pointsC;
-  var pGame=(pp>=3&&pc<3)||(pp>=3&&pc>=3&&advantage==='p');
-  var cGame=(pc>=3&&pp<3)||(pp>=3&&pc>=3&&advantage==='c');
-  if(pGame&&gamesP>=5){matchPointMsg='MATCHBALL '+playerChar.name+'!';matchPointTimer=120;return;}
-  if(cGame&&gamesC>=5){matchPointMsg='MATCHBALL '+cpuChar.name+'!';matchPointTimer=120;return;}
-  if(pGame){matchPointMsg=playerChar.name+': Spielball!';matchPointTimer=120;return;}
-  if(cGame){matchPointMsg=cpuChar.name+': Spielball!';matchPointTimer=120;return;}
-  matchPointMsg='';matchPointTimer=0;
-}
-
-function resetPoint(server){
-  calcCourt();ppx=CW/2;ppy=NY+(CB-NY)*0.6;cpx=CW/2;cpy=CT+(NY-CT)*0.4;
-  bvx=0;bvy=0;bOn=false;ballZ=0;ballVZ=0;ballSpin=0;wallBounced=false;
-  serving=true;sOwner=server;lastH=null;
-  hcP=0;hcC=0;swP=0;swC=0;ticks=0;playing=true;perfectHit=0;
-  cpuReactDelay=Math.round(18-cpuChar.speed*12);
-  cpuMissChance=0.15-cpuChar.speed*0.1;
-  checkMatchPoint();
-  if(server==='p'){bx=ppx;by=ppy-30;cpuServeTimer=0;}
-  else{bx=cpx;by=cpy+20;cpuServeTimer=45;} // CPU serves after 45 frames
-}
-
-// Helper: do a hit with physics
-function doHit(isPlayer,isLob){
-  var cx=isPlayer?ppx:cpx, cy=isPlayer?ppy:cpy;
-  var dx=bx-cx,dy=by-cy,di=Math.sqrt(dx*dx+dy*dy);
-  var ch=isPlayer?playerChar:cpuChar;
-  var reach=35+ch.reach*25;
-  var inRange=di<reach;
-  var correctSide=isPlayer?(by>NY):(by<NY&&bvy<1);
-  if(!inRange||!correctSide)return false;
-
-  // Sweet spot: closer = more power
-  var sweetRatio=1.0-di/reach; // 1.0=perfect, 0=edge
-  var powerMult=0.7+sweetRatio*0.5; // 0.7 to 1.2
-  if(sweetRatio>0.7){perfectHit=20;playTone(1200,0.06,'sine',0.1);} // perfect!
-
-  // Net proximity volley bonus
-  var netDist=Math.abs(cy-NY);
-  var volleyBonus=(netDist<60)?1.3:1.0;
-
-  var basePower=3+ch.power*1.8;
-
-  if(isLob){
-    // LOB: high ball, slow, deep
-    var dir=isPlayer?-1:1;
-    bvx=dx*0.03+(Math.random()-0.5)*0.5;
-    bvy=dir*(1.5+ch.power*0.5);
-    ballZ=15;ballVZ=0.3; // goes very high
-    ballSpin=(Math.random()-0.5)*0.2;
-  } else {
-    // Normal hit or SMASH (if ball is high)
-    var isSmash=ballZ>6;
-    var dir=isPlayer?-1:1;
-    var power=basePower*powerMult*volleyBonus*(isSmash?1.4:1.0);
-    bvx=dx*0.08+(Math.random()-0.5)*1.5;
-    bvy=dir*power;
-    ballZ=isSmash?1:3;ballVZ=isSmash?0:0.15;
-    // Spin from joystick direction
-    if(isPlayer){ballSpin=jxv*0.5;}else{ballSpin=(Math.random()-0.5)*0.4;}
-    if(isSmash){playTone(300,0.1,'square',0.15);} // smash sound
-  }
-
-  wallBounced=false; // reset wall bounce for new rally direction
-  if(isPlayer){hcP=12;lastH='p';swP=12;addBurst(bx,by,ch.shirt);sndHit();}
-  else{hcC=18;lastH='c';swC=12;addBurst(bx,by,ch.shirt);sndHit();}
-  return true;
-}
-
-function update(){
-  if(celebTimer>0){celebTimer--;return;}
-  if(!playing)return;
-  ticks++;calcCourt();
-
-  var mx=jxv,my=jyv;
-  if(keys['ArrowLeft']||keys['KeyA'])mx=-1;if(keys['ArrowRight']||keys['KeyD'])mx=1;
-  if(keys['ArrowUp']||keys['KeyW'])my=-1;if(keys['ArrowDown']||keys['KeyS'])my=1;
-
-  var totalGames=gamesP+gamesC;
-  var pStaminaMult=1.0-(1.0-playerChar.stamina)*totalGames*0.06;
-  if(pStaminaMult<0.55)pStaminaMult=0.55;
-  var pSpd=(2.2+playerChar.speed*2.2)*pStaminaMult;
-  ppx+=mx*pSpd;ppy+=my*pSpd;
-  ppx=Math.max(CL+20,Math.min(CR-20,ppx));ppy=Math.max(NY+30,Math.min(CB-20,ppy));
-
-  // Fatigue sweat particles
-  if(pStaminaMult<0.75&&ticks%15===0){
-    sweatParts.push({x:ppx+(Math.random()-0.5)*10,y:ppy-20,vy:-0.5-Math.random(),vx:(Math.random()-0.5)*0.5,l:25});
-  }
-  var cStaminaMult=1.0-(1.0-cpuChar.stamina)*totalGames*0.06;
-  if(cStaminaMult<0.55)cStaminaMult=0.55;
-  if(cStaminaMult<0.75&&ticks%15===0){
-    sweatParts.push({x:cpx+(Math.random()-0.5)*10,y:cpy-20,vy:-0.5-Math.random(),vx:(Math.random()-0.5)*0.5,l:25});
-  }
-
-  // CPU AI
-  if(bOn){
-    var tx,ty;
-    if(bvy<0){
-      if(ticks>cpuReactDelay){
-        var predErr=(Math.random()-0.5)*(45-cpuChar.speed*35);
-        tx=bx+bvx*6+predErr;ty=by+bvy*5;
-      } else {tx=CW/2;ty=CT+(NY-CT)*0.4;}
-    }else{tx=CW/2;ty=CT+(NY-CT)*0.35;}
-    tx=Math.max(CL+20,Math.min(CR-20,tx));ty=Math.max(CT+20,Math.min(NY-30,ty));
-    var dd=Math.sqrt((tx-cpx)*(tx-cpx)+(ty-cpy)*(ty-cpy));
-    var cSpd=(1.5+cpuChar.speed*1.8)*cStaminaMult;
-    if(dd>2){cpx+=(tx-cpx)/dd*Math.min(cSpd,dd);cpy+=(ty-cpy)/dd*Math.min(cSpd,dd);}
-  }
-
-  if(hcP>0)hcP--;if(hcC>0)hcC--;if(swP>0)swP--;if(swC>0)swC--;
-  if(matchPointTimer>0)matchPointTimer--;
-  if(perfectHit>0)perfectHit--;
-
-  // CPU serve via frame counter (no setTimeout)
-  if(serving&&sOwner==='c'&&cpuServeTimer>0){
-    cpuServeTimer--;
-    if(cpuServeTimer<=0){
-      bOn=true;
-      bvx=(Math.random()-0.5)*1.5;
-      bvy=3.0;
-      ballZ=3;ballVZ=0;ballSpin=0;
-      hcP=25;hcC=35;
-      serving=false;lastH='c';swC=12;sndServe();serveSide=1-serveSide;
+    function baseChecks(pid, d){
+      if(counts[pid] >= maxOf(pid)) return false;
+      if(blocked[pid] && blocked[pid].includes(d)) return false;
+      if(assigned[pid].has(d) || assigned[pid].has(d-1) || assigned[pid].has(d+1)) return false;
+      return true;
     }
-  }
-
-  var wh=hitOn||keys['Space'];
-  var wl=lobOn||keys['KeyL'];
-
-  // Player serve
-  if(serving&&sOwner==='p'&&(wh||wl)){
-    var serveDir=mx||((serveSide===0)?0.5:-0.5);
-    bOn=true;bvx=serveDir*2.5;bvy=-(2.5+playerChar.power*2);
-    ballZ=3;ballVZ=0.2;ballSpin=mx*0.3;wallBounced=false;
-    serving=false;lastH='p';swP=12;sndServe();serveSide=1-serveSide;
-  }
-
-  // Player hit
-  if(!serving&&(wh||wl)&&hcP<=0&&bOn){doHit(true,wl);}
-
-  // CPU hit
-  if(!serving&&bOn&&hcC<=0){
-    var dx2=bx-cpx,dy2=by-cpy,di2=Math.sqrt(dx2*dx2+dy2*dy2);
-    var cReach=35+cpuChar.reach*25;
-    if(di2<cReach&&by<NY&&bvy<1){
-      if(Math.random()<cpuMissChance){swC=12;hcC=20;}
-      else{
-        // CPU decides: lob if far from net, smash if ball high
-        var cpuLob=(di2>cReach*0.7&&Math.random()<0.25);
-        doHit(false,cpuLob);
+    function can(pid, d){
+      if(!baseChecks(pid, d)) return false;
+      const g = dayWeekendGroupIndex(groups, d);
+      if(g!==null && !weGrp[pid].has(g) && weGrp[pid].size >= rules.maxWeekends) return false;
+      return true;
+    }
+    /* Weiche Variante: erlaubt ein zusätzliches Wochenende, wenn sonst nichts geht */
+    function canRelaxed(pid, d){
+      return baseChecks(pid, d);
+    }
+    function assign(pid, d, slot){
+      plan[d][slot] = pid;
+      counts[pid]++; assigned[pid].add(d);
+      const g = dayWeekendGroupIndex(groups, d);
+      if(g!==null) weGrp[pid].add(g);
+    }
+    function shuffled(arr){
+      const a = arr.slice();
+      for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+      return a;
+    }
+    /* Basisbewertung eines Kandidaten: weniger ist besser */
+    function baseScore(pid, d, special){
+      let s = counts[pid]*100 + pastOf(pid).total*6;
+      if(special) s += pastOf(pid).special*25;
+      if(isWish(pid, d)) s -= 90;
+      let gap = 99;
+      assigned[pid].forEach(x=>{ gap = Math.min(gap, Math.abs(x - d)); });
+      s -= Math.min(gap, 14)*4;
+      return s + Math.random()*10;
+    }
+    function pickBest(cands, d, special, bonusFn){
+      let bp = null, bs = Infinity;
+      for(const p of cands){
+        let s = baseScore(p, d, special);
+        if(bonusFn) s += bonusFn(p);
+        if(s < bs){ bs = s; bp = p; }
       }
+      return bp;
     }
+
+    /* --- 1. Wochenend- und Feiertagsblöcke zuerst (Reihenfolge pro Versuch zufällig) --- */
+    shuffled(groups.slice()).forEach(grp=>{
+      if(grp.length >= 3){
+        const f = grp[0], sa = grp[1], so = grp[2];
+        // B: erster Tag Bereitschaft + dritter Tag Ruf, bevorzugt Prioritätsabteilung (benötigt beide Dienstarten)
+        let candFS = participants.filter(p=> canSlot(p,"ruf") && canSlot(p,"ber") && can(p,f) && can(p,so));
+        const B = pickBest(candFS, f, true, p=> deptOf(p)===prioId ? -200 : 0);
+        if(B){ assign(B, f, "ber"); assign(B, so, "ruf"); }
+        // A: erster Tag Ruf + dritter Tag Bereitschaft, bevorzugt andere Abteilung als B
+        candFS = participants.filter(p=> canSlot(p,"ruf") && canSlot(p,"ber") && can(p,f) && can(p,so));
+        const A = pickBest(candFS, f, true, p=> (B && deptOf(p)===deptOf(B)) ? 120 : 0);
+        if(A){ assign(A, f, "ruf"); assign(A, so, "ber"); }
+        // Fehlende Slots am ersten/dritten Tag einzeln (Block-Personen bevorzugen)
+        [["ruf",f],["ber",f],["ruf",so],["ber",so]].forEach(([slot,d])=>{
+          if(!plan[d][slot]){
+            const c = pickBest(participants.filter(p=> canSlot(p,slot) && can(p,d) && plan[d].ruf!==p && plan[d].ber!==p),
+              d, true, p=> (weGrp[p].has(dayWeekendGroupIndex(groups, d)) ? -500 : 0) + ((deptOf(p)===prioId && !dayCoveredByPrio(plan, d)) ? -200 : 0));
+            if(c) assign(c, d, slot);
+          }
+        });
+        // Mittlerer Tag: fehlende Abteilungen bevorzugen
+        const usedDepts = new Set([plan[f].ruf, plan[f].ber, plan[so].ruf, plan[so].ber]
+          .filter(Boolean).map(deptOf));
+        const C = pickBest(participants.filter(p=> canSlot(p,"ruf") && can(p,sa)), sa, true,
+          p=> (usedDepts.has(deptOf(p)) ? 100 : -60) + (canSlot(p,"ber") ? 0 : -40));
+        if(C){ assign(C, sa, "ruf"); usedDepts.add(deptOf(C)); }
+        const D = pickBest(participants.filter(p=> canSlot(p,"ber") && can(p,sa) && plan[sa].ruf!==p), sa, true,
+          p=> usedDepts.has(deptOf(p)) ? 100 : -60);
+        if(D) assign(D, sa, "ber");
+        // Zusatztage im Block (z. B. Feiertagsmontag): Block-Personen stark bevorzugen
+        grp.slice(3).forEach(d=>{
+          ["ruf","ber"].forEach(slot=>{
+            if(plan[d][slot]) return;
+            const c = pickBest(participants.filter(p=> canSlot(p,slot) && can(p,d) && plan[d].ruf!==p && plan[d].ber!==p),
+              d, true, p=> (weGrp[p].has(dayWeekendGroupIndex(groups, d)) ? -500 : 0) + ((deptOf(p)===prioId && !dayCoveredByPrio(plan, d)) ? -800 : 0));
+            if(c) assign(c, d, slot);
+          });
+        });
+      }else{
+        // Kurzer Block (z. B. Einzel-Feiertag oder Monatsrand): Tag für Tag
+        grp.forEach(d=>{
+          ["ruf","ber"].forEach(slot=>{
+            if(plan[d][slot]) return;
+            const c = pickBest(participants.filter(p=> canSlot(p,slot) && can(p,d) && plan[d].ruf!==p && plan[d].ber!==p),
+              d, true, p=> (weGrp[p].has(dayWeekendGroupIndex(groups, d)) ? -500 : 0) + ((deptOf(p)===prioId && !dayCoveredByPrio(plan, d)) ? -200 : 0));
+            if(c) assign(c, d, slot);
+          });
+        });
+      }
+    });
+
+    /* --- 2. Werktage (zufällige Reihenfolge, damit Neustarts Engpässe auflösen) --- */
+    shuffled(days.filter(day=>!day.special)).forEach(day=>{
+      ["ruf","ber"].forEach(slot=>{
+        if(plan[day.d][slot]) return;
+        const cands = participants.filter(p=> canSlot(p,slot) && can(p, day.d) && plan[day.d].ruf!==p && plan[day.d].ber!==p);
+        const c = pickBest(cands, day.d, false, null);
+        if(c) assign(c, day.d, slot);
+      });
+    });
+
+    /* --- 3. Reparatur: verbliebene Lücken notfalls mit gelockertem Wochenendlimit füllen --- */
+    days.forEach(day=>{
+      ["ruf","ber"].forEach(slot=>{
+        if(plan[day.d][slot]) return;
+        const cands = participants.filter(p=> canSlot(p,slot) && canRelaxed(p, day.d) && plan[day.d].ruf!==p && plan[day.d].ber!==p);
+        const c = pickBest(cands, day.d, !!day.special,
+          p=> (deptOf(p)===prioId && day.special && !dayCoveredByPrio(plan, day.d)) ? -300 : 0);
+        if(c) assign(c, day.d, slot);
+      });
+    });
+
+    return {plan, counts};
   }
 
-  // Ball physics
-  if(bOn){
-    bx+=bvx;by+=bvy;
-    bvx*=0.998;
-    // Apply spin curve
-    bvx+=ballSpin*0.03;
-    ballSpin*=0.995;
-    // Ball height (gravity pulls DOWN)
-    ballZ+=ballVZ;ballVZ-=0.02;
-    if(ballZ<0){ballZ=0;ballVZ=0;}
-    if(ballZ>20){ballZ=20;}
-
-    // Side wall bounce
-    if(bx<CL+5){bx=CL+5;bvx=Math.abs(bvx)*0.8;ballSpin*=-0.5;sndBounce();}
-    if(bx>CR-5){bx=CR-5;bvx=-Math.abs(bvx)*0.8;ballSpin*=-0.5;sndBounce();}
-
-    // Out of bounds → point
-    if(by<CT-20){playing=false;sndPoint();setTimeout(function(){awardPoint(lastH==='p'?'p':'c');},300);return;}
-    if(by>CB+20){playing=false;sndPoint();setTimeout(function(){awardPoint(lastH==='c'?'c':'p');},300);return;}
+  function dayCoveredByPrio(plan, d){
+    if(!prioId) return true;
+    const t = plan[d];
+    if(t && ((t.ruf && deptOf(t.ruf)===prioId) || (t.ber && deptOf(t.ber)===prioId))) return true;
+    const prev = plan[d-1];
+    if(prev && prev.ber && deptOf(prev.ber)===prioId) return true; // Bereitschaft bis zum Folgemorgen
+    return false;
   }
 
-  // Update particles
-  for(var i=particles.length-1;i>=0;i--){var p=particles[i];p.x+=p.vx;p.y+=p.vy;p.l--;p.vx*=.93;p.vy*=.93;if(p.l<=0)particles.splice(i,1);}
-  for(var i=sweatParts.length-1;i>=0;i--){var s=sweatParts[i];s.x+=s.vx;s.y+=s.vy;s.l--;if(s.l<=0)sweatParts.splice(i,1);}
-}
-
-function addBurst(x,y,col){for(var i=0;i<10;i++)particles.push({x:x,y:y,vx:(Math.random()-.5)*6,vy:(Math.random()-.5)*6,l:25,c:col});}
-
-// ====== DRAW PERSON ======
-// faceDown=true means we see the FACE (looking toward us)
-// faceDown=false means we see the BACK
-function drawPerson(x,y,faceDown,ch,swing){
-  c.save();c.translate(Math.round(x),Math.round(y));
-  var t=ticks*0.12,bob=Math.sin(t)*1.5,sw=swing>0;
-
-  c.fillStyle='rgba(0,0,0,0.13)';c.beginPath();c.ellipse(0,26+bob,18,6,0,0,Math.PI*2);c.fill();
-  c.fillStyle=ch.skin;c.fillRect(-6,12+bob,4,12);c.fillRect(2,12+bob,4,12);
-  c.fillStyle='#fff';c.fillRect(-7,22+bob,6,4);c.fillRect(1,22+bob,6,4);
-  c.fillStyle=ch.shirt;c.fillRect(-6,24+bob,4,1);c.fillRect(2,24+bob,4,1);
-  c.fillStyle=ch.shorts;c.fillRect(-8,6+bob,16,8);
-  c.fillStyle=ch.trim;c.fillRect(-8,12+bob,16,2);
-  c.fillStyle=ch.shirt;c.fillRect(-10,-8+bob,20,16);
-  c.fillStyle='#fff';c.fillRect(-4,-8+bob,8,3);
-  c.fillStyle=ch.trim;c.fillRect(-10,-8+bob,20,2);
-  c.fillStyle=ch.skin;c.fillRect(-14,-6+bob,4,12);
-  c.fillStyle=ch.skin;
-  if(sw){c.fillRect(10,-6+bob,4,6);c.fillStyle='#8B4513';c.fillRect(12,-16+bob,3,10);c.fillStyle='rgba(100,200,255,0.4)';c.fillRect(8,-26+bob,11,12);c.strokeStyle='#555';c.lineWidth=1.5;c.strokeRect(8,-26+bob,11,12);}
-  else{c.fillRect(10,-6+bob,4,12);c.fillStyle='#8B4513';c.fillRect(14,0+bob,8,3);c.fillStyle='rgba(100,200,255,0.4)';c.fillRect(22,-6+bob,10,14);c.strokeStyle='#555';c.lineWidth=1.5;c.strokeRect(22,-6+bob,10,14);}
-
-  c.fillStyle=ch.skin;c.beginPath();c.arc(0,-16+bob,10,0,Math.PI*2);c.fill();
-  if(faceDown){
-    // Face visible
-    c.fillStyle=ch.hair;c.beginPath();c.arc(0,-19+bob,10,Math.PI,2*Math.PI);c.fill();c.fillRect(-10,-26+bob,20,5);
-    c.fillStyle=ch.shirt;c.fillRect(-10,-22+bob,20,3);
-    c.fillStyle='#222';c.beginPath();c.arc(-4,-17+bob,1.5,0,Math.PI*2);c.fill();c.beginPath();c.arc(4,-17+bob,1.5,0,Math.PI*2);c.fill();
-    c.fillStyle='#fff';c.beginPath();c.arc(-4,-17.5+bob,0.6,0,Math.PI*2);c.fill();c.beginPath();c.arc(4,-17.5+bob,0.6,0,Math.PI*2);c.fill();
-    c.fillStyle='#b0785a';c.fillRect(-2,-12+bob,4,2);
-  }else{
-    // Back of head
-    c.fillStyle=ch.hair;c.beginPath();c.arc(0,-18+bob,10.5,0,Math.PI*2);c.fill();
-    c.fillStyle=ch.shirt;c.fillRect(-10,-22+bob,20,3);
-    c.fillStyle=ch.skin;c.beginPath();c.arc(-10,-16+bob,3,0,Math.PI*2);c.fill();c.beginPath();c.arc(10,-16+bob,3,0,Math.PI*2);c.fill();
-  }
-  c.restore();
-}
-
-// ====== DRAW CELEBRATION (winner jumping) ======
-function drawWinner(x,y,ch,timer){
-  c.save();c.translate(Math.round(x),Math.round(y));
-  var jumpH=Math.abs(Math.sin(timer*0.07))*16;
-  var armAngle=Math.sin(timer*0.1)*0.5;
-  c.translate(0,-jumpH);
-
-  // Shadow (stays on ground)
-  c.save();c.translate(0,jumpH);
-  c.fillStyle='rgba(0,0,0,0.1)';c.beginPath();c.ellipse(0,26,14-jumpH*0.3,4,0,0,Math.PI*2);c.fill();
-  c.restore();
-
-  // Legs together
-  c.fillStyle=ch.skin;c.fillRect(-4,12,3,10);c.fillRect(1,12,3,10);
-  c.fillStyle='#fff';c.fillRect(-5,20,5,4);c.fillRect(0,20,5,4);
-  c.fillStyle=ch.shorts;c.fillRect(-6,6,12,8);
-  c.fillStyle=ch.shirt;c.fillRect(-8,-8,16,16);
-  c.fillStyle=ch.trim;c.fillRect(-8,-8,16,2);
-  // Arms UP celebrating
-  c.fillStyle=ch.skin;
-  c.save();c.translate(-9,-6);c.rotate(-0.8+armAngle);c.fillRect(0,-2,4,16);c.restore();
-  c.save();c.translate(9,-6);c.rotate(0.8-armAngle);c.fillRect(-4,-2,4,16);c.restore();
-  // Head
-  c.fillStyle=ch.skin;c.beginPath();c.arc(0,-16,10,0,Math.PI*2);c.fill();
-  c.fillStyle=ch.hair;c.beginPath();c.arc(0,-19,10,Math.PI,2*Math.PI);c.fill();c.fillRect(-10,-26,20,5);
-  c.fillStyle=ch.shirt;c.fillRect(-10,-22,20,3);
-  // Happy face
-  c.fillStyle='#222';c.beginPath();c.arc(-4,-17,1.5,0,Math.PI*2);c.fill();c.beginPath();c.arc(4,-17,1.5,0,Math.PI*2);c.fill();
-  // Big smile
-  c.strokeStyle='#b0785a';c.lineWidth=2;c.lineCap='round';
-  c.beginPath();c.arc(0,-12,4,0.2,Math.PI-0.2);c.stroke();
-
-  c.restore();
-}
-
-// ====== DRAW LOSER (on knees, crying) ======
-function drawLoser(x,y,ch,timer,tears){
-  c.save();c.translate(Math.round(x),Math.round(y));
-
-  // Shadow
-  c.fillStyle='rgba(0,0,0,0.1)';c.beginPath();c.ellipse(0,16,16,5,0,0,Math.PI*2);c.fill();
-
-  // Kneeling: no standing legs, folded
-  // Lower legs folded under
-  c.fillStyle=ch.skin;c.fillRect(-8,8,5,6);c.fillRect(3,8,5,6);
-  c.fillStyle='#fff';c.fillRect(-9,12,7,4);c.fillRect(2,12,7,4);
-  // Shorts
-  c.fillStyle=ch.shorts;c.fillRect(-7,2,14,8);
-  // Shirt (hunched)
-  c.fillStyle=ch.shirt;c.fillRect(-9,-10,18,14);
-  c.fillStyle=ch.trim;c.fillRect(-9,-10,18,2);
-  // Arms hanging down sadly
-  c.fillStyle=ch.skin;c.fillRect(-12,-4,3,12);c.fillRect(9,-4,3,12);
-  // Head drooping
-  var headDroop=3+Math.sin(timer*0.04)*2;
-  c.fillStyle=ch.skin;c.beginPath();c.arc(0,-16+headDroop,10,0,Math.PI*2);c.fill();
-  c.fillStyle=ch.hair;c.beginPath();c.arc(0,-19+headDroop,10,Math.PI,2*Math.PI);c.fill();c.fillRect(-10,-26+headDroop,20,5);
-  c.fillStyle=ch.shirt;c.fillRect(-10,-22+headDroop,20,3);
-  // Sad face
-  c.fillStyle='#222';
-  // Closed sad eyes (lines)
-  c.strokeStyle='#222';c.lineWidth=1.5;c.lineCap='round';
-  c.beginPath();c.moveTo(-6,-17+headDroop);c.lineTo(-2,-16+headDroop);c.stroke();
-  c.beginPath();c.moveTo(2,-16+headDroop);c.lineTo(6,-17+headDroop);c.stroke();
-  // Sad mouth
-  c.strokeStyle='#b0785a';c.lineWidth=1.5;
-  c.beginPath();c.arc(0,-10+headDroop,3,Math.PI+0.3,2*Math.PI-0.3);c.stroke();
-
-  // TEARS
-  for(var i=0;i<tears.length;i++){
-    var t=tears[i];
-    t.age++;
-    if(t.age<t.delay)continue;
-    var realAge=t.age-t.delay;
-    var side=(i%2===0)?-5:5;
-    var tx=side+t.vx*realAge;
-    var ty=-14+headDroop+t.vy*realAge;
-    if(ty>30){t.age=0;continue;} // reset tear
-    var alpha=1-Math.min(1,realAge/80);
-    c.globalAlpha=alpha*0.7;
-    c.fillStyle='#64b5f6';
-    c.beginPath();c.arc(tx,ty,2,0,Math.PI*2);c.fill();
-    // Teardrop shape
-    c.beginPath();c.moveTo(tx,ty-2);c.lineTo(tx-1.5,ty+1);c.lineTo(tx+1.5,ty+1);c.fill();
-    c.globalAlpha=1;
-  }
-
-  c.restore();
-}
-
-// ====== STAMINA BAR ======
-function drawStaminaBar(x,y,pct,col){
-  var w=30,h=4;
-  c.fillStyle='rgba(0,0,0,0.25)';
-  c.fillRect(x-w/2,y,w,h);
-  var barCol=pct>0.6?'#66bb6a':pct>0.35?'#ffa726':'#ef5350';
-  c.fillStyle=barCol;
-  c.fillRect(x-w/2,y,w*pct,h);
-  c.strokeStyle='rgba(255,255,255,0.3)';c.lineWidth=0.5;
-  c.strokeRect(x-w/2,y,w,h);
-}
-
-// ====== DRAW ======
-function draw(){
-  calcCourt();
-  var g=c.createLinearGradient(0,0,0,CH);g.addColorStop(0,'#87ceeb');g.addColorStop(1,'#b3e5fc');
-  c.fillStyle=g;c.fillRect(0,0,CW,CH);
-
-  // Court
-  c.fillStyle='#64b5f6';c.fillRect(CL,CT,CR-CL,CB-CT);
-  c.strokeStyle='#fff';c.lineWidth=2;c.strokeRect(CL,CT,CR-CL,CB-CT);
-  var hw=(CR-CL)/2;
-  c.strokeStyle='rgba(255,255,255,0.5)';c.lineWidth=1.5;
-  c.strokeRect(CL,NY-(NY-CT)*0.45,hw,(NY-CT)*0.45);c.strokeRect(CL+hw,NY-(NY-CT)*0.45,hw,(NY-CT)*0.45);
-  c.strokeRect(CL,NY+4,hw,(CB-NY)*0.4);c.strokeRect(CL+hw,NY+4,hw,(CB-NY)*0.4);
-  c.strokeStyle='rgba(255,255,255,0.2)';c.lineWidth=1;c.setLineDash([6,4]);
-  c.beginPath();c.moveTo(CW/2,CT);c.lineTo(CW/2,CB);c.stroke();c.setLineDash([]);
-  // Net
-  c.fillStyle='rgba(0,0,0,0.06)';c.fillRect(CL,NY-1,CR-CL,6);
-  c.strokeStyle='#fff';c.lineWidth=2;c.beginPath();c.moveTo(CL,NY);c.lineTo(CR,NY);c.stroke();
-  c.beginPath();c.moveTo(CL,NY+3);c.lineTo(CR,NY+3);c.stroke();
-  c.strokeStyle='rgba(255,255,255,0.35)';c.lineWidth=1;
-  for(var xx=CL;xx<=CR;xx+=8){c.beginPath();c.moveTo(xx,NY);c.lineTo(xx,NY+3);c.stroke();}
-  c.fillStyle='#888';c.fillRect(CL-3,NY-4,6,12);c.fillRect(CR-3,NY-4,6,12);
-
-  // ====== CELEBRATION or normal play ======
-  if(celebTimer>0){
-    var winnerIsP=(celebWinner==='p');
-    var wChar=winnerIsP?playerChar:cpuChar;
-    var lChar=winnerIsP?cpuChar:playerChar;
-    var wX=winnerIsP?ppx:cpx, wY=winnerIsP?ppy:cpy;
-    var lX=winnerIsP?cpx:ppx, lY=winnerIsP?cpy:ppy;
-
-    drawLoser(lX,lY,lChar,260-celebTimer,celebTears);
-    drawWinner(wX,wY,wChar,260-celebTimer);
-
-    // Flash text
-    var msg=(winnerIsP?playerChar.name:cpuChar.name)+' gewinnt das Spiel!';
-    c.globalAlpha=Math.min(1,(260-celebTimer)/15);
-    c.fillStyle='rgba(0,0,0,0.45)';c.fillRect(0,CH/2-28,CW,56);
-    c.fillStyle='#fff';c.font='bold 17px Outfit,sans-serif';c.textAlign='center';c.textBaseline='middle';
-    c.fillText(msg,CW/2,CH/2);
-    c.globalAlpha=1;
-    return;
-  }
-
-  if(!playing&&!serving)return;
-
-  // TOP player = CPU (hunches when tired)
-  if(cpuChar){
-    var cStam2=1.0-(1.0-cpuChar.stamina)*(gamesP+gamesC)*0.06;if(cStam2<0.55)cStam2=0.55;
-    drawPerson(cpx,cpy+(cStam2<0.65?3:0),true,cpuChar,swC);
-    drawStaminaBar(cpx,cpy+30,cStam2,cpuChar.shirt);
-  }
-  // BOTTOM player = You (hunches when tired)
-  if(playerChar){
-    var pStam2=1.0-(1.0-playerChar.stamina)*(gamesP+gamesC)*0.06;if(pStam2<0.55)pStam2=0.55;
-    drawPerson(ppx,ppy+(pStam2<0.65?3:0),false,playerChar,swP);
-    drawStaminaBar(ppx,ppy+30,pStam2,playerChar.shirt);
-  }
-
-  // Sweat particles
-  for(var i=0;i<sweatParts.length;i++){
-    var sw2=sweatParts[i];c.globalAlpha=sw2.l/25*0.6;c.fillStyle='#64b5f6';
-    c.beginPath();c.arc(sw2.x,sw2.y,1.5,0,Math.PI*2);c.fill();
-  }
-  c.globalAlpha=1;
-
-  // Perfect hit flash
-  if(perfectHit>0){
-    c.globalAlpha=perfectHit/20*0.35;c.fillStyle='#fff';
-    c.beginPath();c.arc(bx,by-ballZ*2,25,0,Math.PI*2);c.fill();c.globalAlpha=1;
-  }
-
-  // Ball
-  if(bOn||serving){
-    var shSize=8+ballZ*1.2;
-    var shAlpha=0.15-ballZ*0.008;if(shAlpha<0.03)shAlpha=0.03;
-    c.fillStyle='rgba(0,0,0,'+shAlpha+')';
-    c.beginPath();c.ellipse(bx+2,by+5+ballZ*0.5,shSize,shSize*0.4,0,0,Math.PI*2);c.fill();
-    var ballDrawY=by-ballZ*2;
-    // Spin trail
-    if(bOn&&Math.abs(ballSpin)>0.05){
-      c.globalAlpha=0.2;c.fillStyle=ballSpin>0?'#ff8a80':'#80d8ff';
-      c.beginPath();c.arc(bx-bvx*2,ballDrawY-bvy*2,5,0,Math.PI*2);c.fill();c.globalAlpha=1;
+  function scorePlan(res){
+    const {plan, counts} = res;
+    let s = 0;
+    days.forEach(day=>{
+      if(!plan[day.d].ruf) s += 10000;
+      if(!plan[day.d].ber) s += 10000;
+    });
+    groups.forEach(grp=> grp.forEach(d=>{ if(!dayCoveredByPrio(plan, d)) s += 900; }));
+    // zweites Wochenende pro Person: erlaubt, aber deutlich bestraft (nur als letztes Mittel)
+    participants.forEach(pid=>{
+      const gset = new Set();
+      groups.forEach((grp, gi)=> grp.forEach(d=>{
+        if(plan[d].ruf===pid || plan[d].ber===pid) gset.add(gi);
+      }));
+      if(gset.size > rules.maxWeekends) s += (gset.size - rules.maxWeekends) * 700;
+    });
+    groups.forEach(grp=>{
+      const present = new Set();
+      grp.forEach(d=>{ ["ruf","ber"].forEach(sl=>{ const p=plan[d][sl]; if(p) present.add(deptOf(p)); }); });
+      departments.forEach(dp=>{ if(!dp.priority && !present.has(dp.id)) s += 150; });
+    });
+    // gleichmäßige Verteilung inkl. Vormonats-Last
+    const adj = participants.map(p=> counts[p] + pastOf(p).total*0.4);
+    if(adj.length){
+      const avg = adj.reduce((a,b)=>a+b,0)/adj.length;
+      s += adj.reduce((a,v)=> a + (v-avg)*(v-avg), 0) * 15;
     }
-    var ballR=8+ballZ*0.3;
-    var bg=c.createRadialGradient(bx-2,ballDrawY-2,1,bx,ballDrawY,ballR);
-    bg.addColorStop(0,'#eeff41');bg.addColorStop(1,'#aeea00');
-    c.fillStyle=bg;c.beginPath();c.arc(bx,ballDrawY,ballR,0,Math.PI*2);c.fill();
-    c.strokeStyle='rgba(255,255,255,0.4)';c.lineWidth=1;
-    c.beginPath();c.arc(bx,ballDrawY,ballR*0.6,-.5,1.2);c.stroke();
-    if(ballZ>8){c.fillStyle='rgba(255,255,255,0.5)';c.font='bold 9px Outfit';c.textAlign='center';c.fillText('↑',bx,ballDrawY-ballR-4);}
-  }
-
-  for(var i=0;i<particles.length;i++){var p=particles[i];c.globalAlpha=p.l/25;c.fillStyle=p.c;c.beginPath();c.arc(p.x,p.y,3,0,Math.PI*2);c.fill();}c.globalAlpha=1;
-
-  // Matchball / Spielball display
-  if(matchPointTimer>0&&matchPointMsg){
-    c.globalAlpha=Math.min(1,matchPointTimer/30);
-    c.font='bold 14px Outfit,sans-serif';
-    c.fillStyle='rgba(220,40,40,0.85)';
-    var tw=c.measureText(matchPointMsg).width+40;
-    c.fillRect(CW/2-tw/2,NY+20,tw,32);
-    c.fillStyle='#fff';c.textAlign='center';c.textBaseline='middle';
-    c.fillText(matchPointMsg,CW/2,NY+36);
-    c.globalAlpha=1;
+    // große Lücken belohnen, erfüllte Wünsche belohnen
+    participants.forEach(pid=>{
+      const ds = days.filter(day=> plan[day.d].ruf===pid || plan[day.d].ber===pid).map(day=>day.d).sort((a,b)=>a-b);
+      for(let i=1;i<ds.length;i++){
+        const gap = ds[i]-ds[i-1];
+        if(gap < 5) s += (5-gap)*25;
+      }
+      ds.forEach(d=>{ if(isWish(pid, d)) s -= 35; });
+    });
+    return s;
   }
 }
 
-function loop(){update();draw();requestAnimationFrame(loop);}
-loop();
+/* =====================  Statistik  ===================== */
 
-// Install hint
-(function(){
-  if(window.matchMedia('(display-mode: standalone)').matches) return; // already installed
-  if(localStorage.getItem('fnk-install-dismissed')) return;
-  var hint=document.getElementById('install-hint');
-  var isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent);
-  var isAndroid=/Android/.test(navigator.userAgent);
-  if(!isIOS&&!isAndroid) return;
-  var txt=document.getElementById('ih-text');
-  if(isIOS) txt.innerHTML='Tippe auf <strong>Teilen</strong> <span style="font-size:18px">⬆</span> und dann <strong>"Zum Home-Bildschirm"</strong>';
-  else txt.innerHTML='Tippe auf <strong>⋮ Menü</strong> und dann <strong>"Zum Startbildschirm hinzufügen"</strong>';
-  setTimeout(function(){hint.style.display='flex';},2000);
-  document.getElementById('ih-close').addEventListener('click',function(){
-    hint.style.display='none';
-    localStorage.setItem('fnk-install-dismissed','1');
+function computeStats(state, monthKey){
+  const m = state.months[monthKey];
+  if(!m || !m.plan) return null;
+  const {year, month} = parseMonthKey(monthKey);
+  const days = buildDays(year, month);
+  const perPerson = {};
+  state.people.forEach(p=>{
+    perPerson[p.id] = {ruf:0, ber:0, werktag:0, we:0, feiertag:0, total:0};
   });
-})();
-})();
+  days.forEach(day=>{
+    const t = m.plan[day.d]; if(!t) return;
+    [["ruf", t.ruf],["ber", t.ber]].forEach(([slot,pid])=>{
+      if(!pid || !perPerson[pid]) return;
+      perPerson[pid][slot]++;
+      perPerson[pid][day.special ? "we" : "werktag"]++;
+      if(day.holidayName) perPerson[pid].feiertag++;
+      perPerson[pid].total++;
+    });
+  });
+  const perDept = {};
+  state.departments.forEach(dp=> perDept[dp.id] = {ruf:0, ber:0, werktag:0, we:0, feiertag:0, total:0});
+  state.people.forEach(p=>{
+    const st = perPerson[p.id];
+    if(perDept[p.deptId]){
+      ["ruf","ber","werktag","we","feiertag","total"].forEach(k=> perDept[p.deptId][k] += st[k]);
+    }
+  });
+  return {perPerson, perDept, days};
+}
+
+function computeYearStats(state, year){
+  const perPerson = {};
+  state.people.forEach(p=> perPerson[p.id] = {ruf:0, ber:0, werktag:0, we:0, feiertag:0, total:0, months:0});
+  let any = false;
+  Object.keys(state.months).forEach(k=>{
+    if(!k.startsWith(String(year)+"-")) return;
+    const st = computeStats(state, k);
+    if(!st) return;
+    any = true;
+    state.people.forEach(p=>{
+      const s = st.perPerson[p.id]; if(!s) return;
+      ["ruf","ber","werktag","we","feiertag","total"].forEach(kk=> perPerson[p.id][kk] += s[kk]);
+      if(s.total>0) perPerson[p.id].months++;
+    });
+  });
+  return any ? perPerson : null;
+}
+
+/* =====================  Exporte  ===================== */
+
+function download(filename, content, mime){
+  const blob = new Blob([content], {type:mime});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function exportExcel(state, monthKey){
+  const m = state.months[monthKey];
+  const stats = computeStats(state, monthKey);
+  if(!m || !m.plan || !stats){ alert("Bitte zuerst einen Plan generieren."); return; }
+  const {year, month} = parseMonthKey(monthKey);
+  const days = buildDays(year, month);
+  const pName = pid => { const p = state.people.find(x=>x.id===pid); return p ? p.name : ""; };
+  const deptName = id => { const d = state.departments.find(x=>x.id===id); return d ? d.name : ""; };
+  const pDept = pid => { const p = state.people.find(x=>x.id===pid); return p ? deptName(p.deptId) : ""; };
+
+  const rows1 = [["Datum","Tag","Feiertag","Rufdienst","Abteilung (Ruf)","Bereitschaftsdienst","Abteilung (Bereitschaft)"]];
+  days.forEach(day=>{
+    const t = m.plan[day.d] || {};
+    rows1.push([
+      String(day.d).padStart(2,"0") + "." + String(month).padStart(2,"0") + "." + year,
+      WD_SHORT[day.wd],
+      day.holidayName || "",
+      t.ruf ? pName(t.ruf) : "— unbesetzt —",
+      t.ruf ? pDept(t.ruf) : "",
+      t.ber ? pName(t.ber) : "— unbesetzt —",
+      t.ber ? pDept(t.ber) : ""
+    ]);
+  });
+
+  const head2 = ["","Fachabteilung","Rufdienste","Bereitschaftsdienste","Werktagsdienste","Wochenend-/Feiertagsdienste","davon Feiertage","Gesamt"];
+  const rows2 = [["Person"].concat(head2.slice(1))];
+  state.people.filter(p=> (m.participants||[]).includes(p.id)).forEach(p=>{
+    const st = stats.perPerson[p.id];
+    rows2.push([p.name, deptName(p.deptId), st.ruf, st.ber, st.werktag, st.we, st.feiertag, st.total]);
+  });
+  rows2.push([]);
+  rows2.push(["Fachabteilung","","Rufdienste","Bereitschaftsdienste","Werktagsdienste","Wochenend-/Feiertagsdienste","davon Feiertage","Gesamt"]);
+  state.departments.forEach(dp=>{
+    const st = stats.perDept[dp.id];
+    rows2.push([dp.name, "", st.ruf, st.ber, st.werktag, st.we, st.feiertag, st.total]);
+  });
+
+  const wb = XLSX.utils.book_new();
+  const ws1 = XLSX.utils.aoa_to_sheet(rows1);
+  ws1["!cols"] = [{wch:12},{wch:5},{wch:18},{wch:22},{wch:26},{wch:22},{wch:26}];
+  const ws2 = XLSX.utils.aoa_to_sheet(rows2);
+  ws2["!cols"] = [{wch:24},{wch:26},{wch:11},{wch:18},{wch:15},{wch:24},{wch:14},{wch:8}];
+  XLSX.utils.book_append_sheet(wb, ws1, "Dienstplan");
+  XLSX.utils.book_append_sheet(wb, ws2, "Statistik");
+  XLSX.writeFile(wb, "Dienstplan_" + MONTH_NAMES[month-1] + "_" + year + ".xlsx");
+}
+
+function exportICS(state, monthKey, pid){
+  const m = state.months[monthKey];
+  if(!m || !m.plan) return;
+  const {year, month} = parseMonthKey(monthKey);
+  const days = buildDays(year, month);
+  const p = state.people.find(x=>x.id===pid);
+  if(!p) return;
+  const fmt = d => String(year) + String(month).padStart(2,"0") + String(d).padStart(2,"0");
+  const nextDay = d =>{
+    const dt = new Date(year, month-1, d+1);
+    return String(dt.getFullYear()) + String(dt.getMonth()+1).padStart(2,"0") + String(dt.getDate()).padStart(2,"0");
+  };
+  const stamp = new Date().toISOString().replace(/[-:]/g,"").split(".")[0] + "Z";
+  const lines = ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Dienstplan Chirurgie//DE","CALSCALE:GREGORIAN"];
+  days.forEach(day=>{
+    const t = m.plan[day.d]; if(!t) return;
+    [["ruf","Rufdienst"],["ber","Bereitschaftsdienst"]].forEach(([slot,label])=>{
+      if(t[slot]!==pid) return;
+      lines.push("BEGIN:VEVENT");
+      lines.push("UID:" + monthKey + "-" + day.d + "-" + slot + "-" + pid + "@dienstplan");
+      lines.push("DTSTAMP:" + stamp);
+      lines.push("DTSTART;VALUE=DATE:" + fmt(day.d));
+      lines.push("DTEND;VALUE=DATE:" + nextDay(day.d));
+      lines.push("SUMMARY:" + label);
+      if(slot==="ber") lines.push("DESCRIPTION:Bereitschaftsdienst – Anwesenheit bis zum Folgemorgen");
+      lines.push("END:VEVENT");
+    });
+  });
+  lines.push("END:VCALENDAR");
+  download("Dienste_" + p.name.replace(/\s+/g,"_") + "_" + monthKey + ".ics", lines.join("\r\n"), "text/calendar");
+}
+
+/* =====================  App  ===================== */
+
+function App(){
+  const [state, setState] = useState(loadState);
+  const [tab, setTab] = useState(state.people.length ? "planung" : "team");
+  const [monthKey, setMonthKey] = useState(defaultMonthKey());
+  const fileRef = useRef(null);
+
+  useEffect(()=>{
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+  }, [state]);
+
+  function update(fn){ setState(prev=>{ const next = JSON.parse(JSON.stringify(prev)); fn(next); return next; }); }
+
+  function exportJSON(){
+    download("dienstplan-daten.json", JSON.stringify(state, null, 2), "application/json");
+  }
+  function importJSON(ev){
+    const file = ev.target.files[0]; if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      try{
+        const s = JSON.parse(reader.result);
+        if(!s.departments || !s.people) throw new Error("Format");
+        if(!s.rules.fairnessMonths) s.rules.fairnessMonths = 3;
+        setState(s);
+        alert("Daten wurden importiert.");
+      }catch(e){ alert("Die Datei konnte nicht gelesen werden. Bitte einen gültigen Export wählen."); }
+    };
+    reader.readAsText(file);
+    ev.target.value = "";
+  }
+
+  return (
+    <div>
+      <header>
+        <h1>Dienstplan <span>· Ruf- und Bereitschaftsdienste</span></h1>
+        <div className="head-spacer"></div>
+        <button className="head-btn" onClick={exportJSON}>Daten sichern (JSON)</button>
+        <button className="head-btn" onClick={()=>fileRef.current.click()}>Daten laden</button>
+        <input ref={fileRef} type="file" accept=".json" style={{display:"none"}} onChange={importJSON}/>
+      </header>
+      <nav>
+        <button className={tab==="team"?"active":""} onClick={()=>setTab("team")}>Team &amp; Regeln</button>
+        <button className={tab==="planung"?"active":""} onClick={()=>setTab("planung")}>Monatsplanung</button>
+        <button className={tab==="statistik"?"active":""} onClick={()=>setTab("statistik")}>Statistik</button>
+        <button className={tab==="wunsch"?"active":""} onClick={()=>setTab("wunsch")}>Wünsche erfassen</button>
+      </nav>
+      <main>
+        {tab==="team" && <div className="no-print"><TeamTab state={state} update={update}/></div>}
+        {tab==="planung" && <PlanTab state={state} update={update} monthKey={monthKey} setMonthKey={setMonthKey}/>}
+        {tab==="statistik" && <div className="no-print"><StatsTab state={state} monthKey={monthKey} setMonthKey={setMonthKey}/></div>}
+        {tab==="wunsch" && <div className="no-print"><WishTab state={state}/></div>}
+      </main>
+    </div>
+  );
+}
+
+/* ---------- Team & Regeln ---------- */
+
+function TeamTab({state, update}){
+  const [newName, setNewName] = useState("");
+  const [newDept, setNewDept] = useState(state.departments[0] ? state.departments[0].id : "");
+
+  function addPerson(){
+    const name = newName.trim();
+    if(!name || !newDept) return;
+    update(s=> s.people.push({id:uid(), name, deptId:newDept, active:true, maxServices:null, slots:"beide"}));
+    setNewName("");
+  }
+
+  return (
+    <div>
+      <div className="card">
+        <h2>Fachabteilungen</h2>
+        <p className="hint">Die Abteilung mit Wochenend-Priorität soll an jedem Wochenend- und Feiertagstag vertreten sein. Ein Bereitschaftsdienst deckt dabei auch den Folgemorgen ab.</p>
+        <table>
+          <thead><tr><th>Name</th><th>Farbe</th><th>Wochenend-Priorität</th><th></th></tr></thead>
+          <tbody>
+            {state.departments.map(dp=>(
+              <tr key={dp.id}>
+                <td><input type="text" value={dp.name} style={{width:"100%", maxWidth:"20rem"}}
+                  onChange={e=>update(s=>{ s.departments.find(x=>x.id===dp.id).name = e.target.value; })}/></td>
+                <td><input type="color" value={dp.color} style={{width:"2.4rem", height:"1.7rem", border:"1px solid var(--line)", borderRadius:"5px", padding:"1px"}}
+                  onChange={e=>update(s=>{ s.departments.find(x=>x.id===dp.id).color = e.target.value; })}/></td>
+                <td><input type="radio" name="prio" checked={dp.priority}
+                  onChange={()=>update(s=>{ s.departments.forEach(x=> x.priority = x.id===dp.id); })}/></td>
+                <td><button className="btn danger" onClick={()=>{
+                  if(state.people.some(p=>p.deptId===dp.id)){ alert("Dieser Abteilung sind noch Personen zugeordnet."); return; }
+                  update(s=>{ s.departments = s.departments.filter(x=>x.id!==dp.id); });
+                }}>Entfernen</button></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <div style={{marginTop:"0.7rem"}}>
+          <button className="btn secondary small" onClick={()=>update(s=>{
+            s.departments.push({id:uid(), name:"Neue Abteilung", color:DEPT_COLORS[s.departments.length % DEPT_COLORS.length], priority:false});
+          })}>Abteilung hinzufügen</button>
+        </div>
+      </div>
+
+      <div className="card">
+        <h2>Diensthabende</h2>
+        <p className="hint">Inaktive Personen bleiben gespeichert, werden aber bei neuen Monaten nicht vorausgewählt. Ein individuelles Maximum überschreibt die allgemeine Obergrenze (z. B. für Teilzeit); leer bedeutet Standard.</p>
+        <div className="flexrow" style={{marginBottom:"0.8rem"}}>
+          <input type="text" placeholder="Name" value={newName} onChange={e=>setNewName(e.target.value)}
+            onKeyDown={e=>{ if(e.key==="Enter") addPerson(); }}/>
+          <select value={newDept} onChange={e=>setNewDept(e.target.value)}>
+            {state.departments.map(dp=><option key={dp.id} value={dp.id}>{dp.name}</option>)}
+          </select>
+          <button className="btn small" onClick={addPerson}>Hinzufügen</button>
+        </div>
+        {state.people.length===0 && <p className="muted" style={{fontSize:"0.88rem"}}>Noch keine Personen angelegt. Trage oben Name und Abteilung ein.</p>}
+        {state.people.length>0 &&
+        <table>
+          <thead><tr><th>Name</th><th>Fachabteilung</th><th>Dienstarten</th><th>Max. Dienste</th><th>Aktiv</th><th></th></tr></thead>
+          <tbody>
+            {state.people.map(p=>{
+              const dp = state.departments.find(x=>x.id===p.deptId);
+              return (
+                <tr key={p.id} style={{opacity:p.active?1:0.55}}>
+                  <td><input type="text" value={p.name} style={{maxWidth:"13rem"}}
+                    onChange={e=>update(s=>{ s.people.find(x=>x.id===p.id).name = e.target.value; })}/></td>
+                  <td>
+                    <span className="dept-dot" style={{background:dp?dp.color:"#999"}}></span>
+                    <select value={p.deptId} onChange={e=>update(s=>{ s.people.find(x=>x.id===p.id).deptId = e.target.value; })}>
+                      {state.departments.map(d2=><option key={d2.id} value={d2.id}>{d2.name}</option>)}
+                    </select>
+                  </td>
+                  <td>
+                    <select value={p.slots || "beide"} onChange={e=>update(s=>{ s.people.find(x=>x.id===p.id).slots = e.target.value; })}>
+                      <option value="beide">Ruf + Bereitschaft</option>
+                      <option value="ruf">Nur Rufdienst</option>
+                      <option value="ber">Nur Bereitschaft</option>
+                    </select>
+                  </td>
+                  <td><input type="number" min="1" max="15" placeholder={String(state.rules.maxServices)}
+                    value={p.maxServices || ""} style={{width:"4.2rem"}}
+                    onChange={e=>update(s=>{ s.people.find(x=>x.id===p.id).maxServices = e.target.value ? Math.max(1, Number(e.target.value)) : null; })}/></td>
+                  <td><input type="checkbox" checked={p.active}
+                    onChange={e=>update(s=>{ s.people.find(x=>x.id===p.id).active = e.target.checked; })}/></td>
+                  <td><button className="btn danger" onClick={()=>{
+                    if(confirm(p.name + " wirklich löschen?")) update(s=>{ s.people = s.people.filter(x=>x.id!==p.id); });
+                  }}>Löschen</button></td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>}
+      </div>
+
+      <div className="card">
+        <h2>Regeln</h2>
+        <div className="flexrow">
+          <label style={{fontSize:"0.88rem"}}>Maximale Dienste pro Person und Monat&nbsp;
+            <input type="number" min="1" max="15" value={state.rules.maxServices} style={{width:"4.2rem"}}
+              onChange={e=>update(s=>{ s.rules.maxServices = Math.max(1, Number(e.target.value)||5); })}/>
+          </label>
+          <label style={{fontSize:"0.88rem"}}>Fairness: Vormonate berücksichtigen&nbsp;
+            <input type="number" min="0" max="12" value={state.rules.fairnessMonths} style={{width:"4.2rem"}}
+              onChange={e=>update(s=>{ s.rules.fairnessMonths = Math.max(0, Number(e.target.value)||0); })}/>
+          </label>
+        </div>
+        <p className="hint" style={{marginTop:"0.6rem", marginBottom:0}}>
+          Fest hinterlegt sind außerdem: pro Tag ein Ruf- und ein Bereitschaftsdienst von verschiedenen Personen, die Dienstart jeder Person, keine Dienste an aufeinanderfolgenden Tagen sowie möglichst große Abstände zwischen den Diensten. Gesetzliche Feiertage in NRW werden automatisch erkannt und wie Wochenendtage behandelt. Der Freitag/Sonntag-Tausch (Ruf ↔ Bereitschaft) und maximal ein Wochenend-/Feiertagsblock pro Person sind Optimierungsziele, keine harten Regeln: Wenn Sperr- und Wunschtage nichts anderes zulassen, mischt der Generator die Wochenendbesetzung freier und setzt Personen notfalls an einem zweiten Wochenende ein, damit alle Dienste besetzt werden. Wer in den Vormonaten viel gearbeitet hat, wird bei der Verteilung entlastet. Sperrtage werden immer eingehalten, Wunschtage bevorzugt vergeben. Lässt sich ein Tag trotz allem nicht besetzen, bleibt er frei und wird markiert.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Monatsplanung ---------- */
+
+function PlanTab({state, update, monthKey, setMonthKey}){
+  const {year, month} = parseMonthKey(monthKey);
+  const days = useMemo(()=>buildDays(year, month), [monthKey]);
+  const groups = useMemo(()=>weekendGroups(days), [days]);
+  const m = state.months[monthKey];
+  const wishFileRef = useRef(null);
+  const [swapA, setSwapA] = useState("");
+  const [swapB, setSwapB] = useState("");
+  const [swapMsg, setSwapMsg] = useState(null);
+  const [wishView, setWishView] = useState("liste");
+  const [openPid, setOpenPid] = useState(null);
+
+  useEffect(()=>{
+    if(!state.months[monthKey]){
+      update(s=>{
+        s.months[monthKey] = {
+          participants: s.people.filter(p=>p.active).map(p=>p.id),
+          blocked: {},
+          wishes: {},
+          wishStatus: {},
+          deadline: null,
+          plan: null
+        };
+      });
+    }
+  }, [monthKey]);
+  useEffect(()=>{ setSwapA(""); setSwapB(""); setSwapMsg(null); setOpenPid(null); }, [monthKey]);
+
+  if(!m) return null;
+  const participants = m.participants || [];
+  const personById = {}; state.people.forEach(p=>personById[p.id]=p);
+  const deptById = {}; state.departments.forEach(d=>deptById[d.id]=d);
+  const prio = state.departments.find(d=>d.priority);
+  const holidaysInMonth = days.filter(d=>d.holidayName);
+
+  function toggleParticipant(pid){
+    update(s=>{
+      const mm = s.months[monthKey];
+      if(mm.participants.includes(pid)) mm.participants = mm.participants.filter(x=>x!==pid);
+      else mm.participants.push(pid);
+    });
+  }
+  /* Zellen wechseln zwischen: frei → gesperrt → Wunsch → frei */
+  function cycleDay(pid, d){
+    update(s=>{
+      const mm = s.months[monthKey];
+      if(!mm.blocked[pid]) mm.blocked[pid] = [];
+      if(!mm.wishes) mm.wishes = {};
+      if(!mm.wishes[pid]) mm.wishes[pid] = [];
+      const bi = mm.blocked[pid].indexOf(d);
+      const wi = mm.wishes[pid].indexOf(d);
+      if(bi<0 && wi<0){ mm.blocked[pid].push(d); }
+      else if(bi>=0){ mm.blocked[pid].splice(bi,1); mm.wishes[pid].push(d); }
+      else { mm.wishes[pid].splice(wi,1); }
+    });
+  }
+  function setDone(pid, val){
+    update(s=>{
+      const mm = s.months[monthKey];
+      if(!mm.wishStatus) mm.wishStatus = {};
+      if(val) mm.wishStatus[pid] = true; else delete mm.wishStatus[pid];
+    });
+  }
+  function ampelFor(pid){
+    if(m.wishStatus && m.wishStatus[pid]) return "g";
+    const has = (((m.blocked||{})[pid])||[]).length + (((m.wishes||{})[pid])||[]).length;
+    return has > 0 ? "y" : "r";
+  }
+  const doneCount = participants.filter(pid=> m.wishStatus && m.wishStatus[pid]).length;
+  const todayStr = new Date().toISOString().slice(0,10);
+  const deadlinePassed = !!(m.deadline && todayStr > m.deadline);
+  const isFinal = (participants.length>0 && doneCount===participants.length) || deadlinePassed;
+  const fmtDate = iso => { if(!iso) return ""; const [y,mo,d] = iso.split("-"); return Number(d)+"."+Number(mo)+"."+y; };
+
+  function resetMonth(){
+    if(!confirm("Diesen Monat wirklich komplett zurücksetzen? Plan, Sperr-/Wunschtage, Status und Stichtag werden gelöscht.")) return;
+    update(s=>{
+      s.months[monthKey] = {
+        participants: s.people.filter(p=>p.active).map(p=>p.id),
+        blocked: {}, wishes: {}, wishStatus: {}, deadline: null, plan: null
+      };
+    });
+    setOpenPid(null); setSwapA(""); setSwapB(""); setSwapMsg(null);
+  }
+
+  function runGenerate(){
+    if(participants.length < 2){ alert("Bitte mindestens zwei Personen für diesen Monat auswählen."); return; }
+    if(m.plan && !confirm("Es existiert bereits ein Plan für diesen Monat. Neu generieren und überschreiben? Manuelle Änderungen gehen dabei verloren.")) return;
+    const res = generatePlan({
+      days, groups, participants,
+      blocked: m.blocked || {},
+      wishes: m.wishes || {},
+      people: state.people, departments: state.departments,
+      rules: state.rules,
+      past: pastLoad(state, monthKey)
+    });
+    update(s=>{ s.months[monthKey].plan = res.plan; });
+    setSwapMsg(null);
+  }
+  function setSlot(d, slot, pid){
+    update(s=>{
+      if(!s.months[monthKey].plan) return;
+      s.months[monthKey].plan[d][slot] = pid || null;
+    });
+  }
+
+  /* Regelverstöße einer hypothetischen Zuweisung (Slot selbst ausgenommen) */
+  function violations(pid, d, slot, planOverride){
+    const plan = planOverride || m.plan;
+    if(!plan) return [];
+    const v = [];
+    if(((m.blocked||{})[pid]||[]).includes(d)) v.push("Sperrtag");
+    const sp = (personById[pid] && personById[pid].slots) || "beide";
+    if(sp!=="beide" && sp!==slot) v.push(slot==="ruf" ? "macht nur Bereitschaft" : "macht nur Rufdienst");
+    let count = 0; const dsSet = new Set(); let weSet = new Set();
+    days.forEach(day=>{
+      ["ruf","ber"].forEach(sl=>{
+        if(day.d===d && sl===slot) return;
+        if(plan[day.d] && plan[day.d][sl]===pid){
+          count++; dsSet.add(day.d);
+          const g = dayWeekendGroupIndex(groups, day.d);
+          if(g!==null) weSet.add(g);
+        }
+      });
+    });
+    const max = personMax(personById[pid], state.rules);
+    if(count+1 > max) v.push("über " + max + " Dienste");
+    if(dsSet.has(d)) v.push("bereits an diesem Tag");
+    if(dsSet.has(d-1) || dsSet.has(d+1)) v.push("Folgetag-Konflikt");
+    const g = dayWeekendGroupIndex(groups, d);
+    if(g!==null){ weSet.add(g); if(weSet.size > state.rules.maxWeekends) v.push("zweiter WE-Block"); }
+    return v;
+  }
+
+  function prioCovered(d){
+    if(!m.plan || !prio) return true;
+    const isP = pid => pid && personById[pid] && personById[pid].deptId===prio.id;
+    const t = m.plan[d];
+    if(t && (isP(t.ruf) || isP(t.ber))) return true;
+    const prev = m.plan[d-1];
+    return !!(prev && isP(prev.ber));
+  }
+
+  /* Konflikt-Assistent: beste Kandidaten für einen leeren Slot */
+  function suggestionsFor(d, slot){
+    const otherSlot = slot==="ruf" ? "ber" : "ruf";
+    return participants
+      .filter(pid=> m.plan[d][otherSlot]!==pid)
+      .map(pid=> ({pid, v: violations(pid, d, slot)}))
+      .filter(x=> !x.v.includes("Sperrtag") && !x.v.includes("bereits an diesem Tag") && !x.v.some(s=>s.indexOf("macht nur")===0))
+      .sort((a,b)=> a.v.length - b.v.length)
+      .slice(0,3);
+  }
+
+  /* Wunsch-Dateien der Mitarbeiter einlesen */
+  function importWishes(ev){
+    const files = Array.from(ev.target.files || []);
+    if(!files.length) return;
+    let done = 0, fail = [];
+    files.forEach(file=>{
+      const reader = new FileReader();
+      reader.onload = ()=>{
+        try{
+          const w = JSON.parse(reader.result);
+          if(w.type!=="dienstwunsch" || !w.monthKey) throw new Error("Format");
+          let person = state.people.find(p=>p.id===w.personId);
+          if(!person && w.personName) person = state.people.find(p=>p.name.trim().toLowerCase()===w.personName.trim().toLowerCase());
+          if(!person){ fail.push(w.personName || file.name); }
+          else{
+            update(s=>{
+              if(!s.months[w.monthKey]) s.months[w.monthKey] = {participants: s.people.filter(p=>p.active).map(p=>p.id), blocked:{}, wishes:{}, wishStatus:{}, deadline:null, plan:null};
+              const mm = s.months[w.monthKey];
+              if(!mm.wishes) mm.wishes = {};
+              if(!mm.wishStatus) mm.wishStatus = {};
+              mm.blocked[person.id] = (w.blocked||[]).slice();
+              mm.wishes[person.id] = (w.wishes||[]).slice();
+              mm.wishStatus[person.id] = true;
+              if(!mm.participants.includes(person.id)) mm.participants.push(person.id);
+            });
+          }
+        }catch(e){ fail.push(file.name); }
+        done++;
+        if(done===files.length){
+          alert((files.length - fail.length) + " Wunsch-Datei(en) übernommen." + (fail.length ? " Nicht zuordenbar: " + fail.join(", ") : ""));
+        }
+      };
+      reader.readAsText(file);
+    });
+    ev.target.value = "";
+  }
+
+  /* Tauschfunktion */
+  const allAssignments = [];
+  if(m.plan){
+    days.forEach(day=>{
+      ["ruf","ber"].forEach(slot=>{
+        const pid = m.plan[day.d][slot];
+        if(pid && personById[pid]) allAssignments.push({
+          key: day.d + "|" + slot,
+          label: day.d + "." + month + ". " + (slot==="ruf"?"Ruf":"Bereitschaft") + " – " + personById[pid].name
+        });
+      });
+    });
+  }
+  function checkSwap(){
+    if(!swapA || !swapB || swapA===swapB){ setSwapMsg({ok:false, text:"Bitte zwei verschiedene Dienste auswählen."}); return; }
+    const [d1s, s1] = swapA.split("|"); const [d2s, s2] = swapB.split("|");
+    const d1 = Number(d1s), d2 = Number(d2s);
+    const p1 = m.plan[d1][s1], p2 = m.plan[d2][s2];
+    if(p1===p2){ setSwapMsg({ok:false, text:"Beide Dienste gehören derselben Person."}); return; }
+    const sim = JSON.parse(JSON.stringify(m.plan));
+    sim[d1][s1] = null; sim[d2][s2] = null;
+    const v1 = violations(p2, d1, s1, sim);
+    const v2 = violations(p1, d2, s2, sim);
+    const probs = [];
+    if(v1.length) probs.push(personById[p2].name + " am " + d1 + "." + month + ".: " + v1.join(", "));
+    if(v2.length) probs.push(personById[p1].name + " am " + d2 + "." + month + ".: " + v2.join(", "));
+    if(!probs.length) setSwapMsg({ok:true, text:"Der Tausch ist regelkonform.", apply:true});
+    else setSwapMsg({ok:false, text:"Der Tausch verletzt Regeln – " + probs.join(" · "), apply:true});
+  }
+  function applySwap(){
+    const [d1s, s1] = swapA.split("|"); const [d2s, s2] = swapB.split("|");
+    const d1 = Number(d1s), d2 = Number(d2s);
+    update(s=>{
+      const pl = s.months[monthKey].plan;
+      const tmp = pl[d1][s1]; pl[d1][s1] = pl[d2][s2]; pl[d2][s2] = tmp;
+    });
+    setSwapA(""); setSwapB(""); setSwapMsg({ok:true, text:"Getauscht."});
+  }
+
+  const conflicts = [];
+  if(m.plan){
+    days.forEach(day=>{
+      const t = m.plan[day.d];
+      if(!t || !t.ruf) conflicts.push({d:day.d, slot:"ruf"});
+      if(!t || !t.ber) conflicts.push({d:day.d, slot:"ber"});
+    });
+  }
+
+  const firstWd = (days[0].wd + 6) % 7;
+  const cells = [];
+  for(let i=0;i<firstWd;i++) cells.push(null);
+  days.forEach(day=>cells.push(day));
+  while(cells.length % 7 !== 0) cells.push(null);
+
+  const deptName = id => deptById[id] ? deptById[id].name : "";
+
+  return (
+    <div>
+      <div className="no-print">
+      <div className="card">
+        <div className="toolbar">
+          <label style={{fontSize:"0.9rem", fontWeight:600}}>Monat&nbsp;
+            <input type="month" value={monthKey} onChange={e=>{ if(e.target.value) setMonthKey(e.target.value); }}/>
+          </label>
+          <div className="head-spacer"></div>
+          <button className="btn secondary" onClick={()=>wishFileRef.current.click()}>Wünsche importieren</button>
+          <input ref={wishFileRef} type="file" accept=".json" multiple style={{display:"none"}} onChange={importWishes}/>
+          <button className="btn secondary" onClick={resetMonth}>Monat zurücksetzen</button>
+          <button className="btn" onClick={runGenerate}>Plan generieren</button>
+          <button className="btn secondary" onClick={()=>exportExcel(state, monthKey)} disabled={!m.plan}>Excel</button>
+          <button className="btn secondary" onClick={()=>window.print()} disabled={!m.plan}>Drucken</button>
+        </div>
+        {holidaysInMonth.length>0 &&
+          <p className="hint" style={{marginTop:"0.6rem", marginBottom:0}}>
+            Feiertage in diesem Monat (werden wie Wochenendtage behandelt): {holidaysInMonth.map(d=> d.d + "." + month + ". " + d.holidayName).join(", ")}.
+          </p>}
+        {state.rules.fairnessMonths>0 &&
+          <p className="hint" style={{marginTop:"0.4rem", marginBottom:0}}>
+            Zur fairen Verteilung fließt die Belastung der letzten {state.rules.fairnessMonths} generierten Monate ein.
+          </p>}
+        {(()=>{
+          const needed = groups.reduce((a,g)=> a + (g.length===1 ? 2 : 4), 0);
+          if(participants.length >= needed || participants.length===0) return null;
+          return <p className="hint" style={{marginTop:"0.4rem", marginBottom:0, color:"var(--warn)"}}>
+            Hinweis: Dieser Monat hat {groups.length} Wochenend-/Feiertagsblöcke, für die bei nur einem Block pro Person mindestens {needed} verschiedene Personen nötig wären. Ausgewählt sind {participants.length} – einzelne Personen werden daher voraussichtlich an einem zweiten Wochenende eingesetzt.
+          </p>;
+        })()}
+      </div>
+
+      <div className="card">
+        <h2>Wer kommt in {MONTH_NAMES[month-1]} für Dienste infrage?</h2>
+        {state.people.length===0 && <p className="muted" style={{fontSize:"0.88rem"}}>Lege zuerst unter „Team &amp; Regeln" die Diensthabenden an.</p>}
+        <div className="flexrow">
+          {state.people.map(p=>{
+            const on = participants.includes(p.id);
+            const dp = deptById[p.deptId];
+            return (
+              <label key={p.id} className={"person-check" + (on?"":" off")}>
+                <input type="checkbox" checked={on} onChange={()=>toggleParticipant(p.id)}/>
+                <span className="dept-dot" style={{background:dp?dp.color:"#999", marginRight:0}}></span>
+                {p.name}
+              </label>
+            );
+          })}
+        </div>
+      </div>
+
+      {participants.length>0 &&
+      <div className="card">
+        <h2>Sperr- und Wunschtage</h2>
+        <div className="flexrow" style={{marginBottom:"0.7rem"}}>
+          <label style={{fontSize:"0.86rem"}}>Stichtag für Wünsche&nbsp;
+            <input type="date" value={m.deadline||""} onChange={e=>update(s=>{ s.months[monthKey].deadline = e.target.value || null; })}/>
+          </label>
+          <span className={"chip" + (isFinal ? " final-chip" : "")}>
+            {doneCount} von {participants.length} abgeschlossen
+            {isFinal ? " · FINAL" : (m.deadline ? " · Stichtag " + fmtDate(m.deadline) : "")}
+          </span>
+          <div className="head-spacer"></div>
+          <button className={"btn small" + (wishView==="liste"?"":" secondary")} onClick={()=>setWishView("liste")}>Personenliste</button>
+          <button className={"btn small" + (wishView==="matrix"?"":" secondary")} onClick={()=>setWishView("matrix")}>Matrix</button>
+        </div>
+        <p className="hint">Einmal klicken sperrt einen Tag (✕, wird immer eingehalten), zweimal klicken macht ihn zum Wunschtag (✓, wird bevorzugt vergeben), dreimal klicken setzt ihn zurück. Alle Einträge bleiben pro Monat gespeichert – Wünsche können also nach und nach eintreffen und der Plan jederzeit neu generiert werden. Die Ampel zeigt den Stand: grün = vom Planer als abgeschlossen markiert, gelb = Einträge vorhanden, aber noch offen, rot = noch keine Einträge. Der Monat gilt als FINAL, sobald alle abgeschlossen sind oder der Stichtag verstrichen ist. Importierte Wunsch-Dateien setzen die Person automatisch auf abgeschlossen.</p>
+
+        {wishView==="liste" &&
+        <div>
+          {participants.map(pid=>{
+            const p = personById[pid]; if(!p) return null;
+            const bl = (m.blocked||{})[pid] || [];
+            const ws = (m.wishes||{})[pid] || [];
+            const done = !!(m.wishStatus && m.wishStatus[pid]);
+            const amp = ampelFor(pid);
+            const open = openPid===pid;
+            const dp = deptById[p.deptId];
+            return (
+              <div key={pid} className="acc">
+                <div className="acc-head" onClick={()=>setOpenPid(open ? null : pid)}
+                  title={amp==="g" ? "Einträge abgeschlossen" : (amp==="y" ? "Einträge vorhanden, noch offen" : "Noch keine Einträge")}>
+                  <span className={"amp " + amp}></span>
+                  <span className="dept-dot" style={{background: dp ? dp.color : "#999", marginRight:0}}></span>
+                  <strong style={{fontSize:"0.9rem"}}>{p.name}</strong>
+                  <span className="cnt">{bl.length} gesperrt · {ws.length} Wunsch{ws.length===1?"":"tage"}</span>
+                  <div className="head-spacer"></div>
+                  <label className="acc-done" onClick={e=>e.stopPropagation()}>
+                    <input type="checkbox" checked={done} onChange={e=>setDone(pid, e.target.checked)}/>
+                    abgeschlossen
+                  </label>
+                  <span className="muted">{open ? "▲" : "▼"}</span>
+                </div>
+                {open &&
+                <div className="acc-body">
+                  <div className="cal-grid" style={{maxWidth:"38rem"}}>
+                    {["Mo","Di","Mi","Do","Fr","Sa","So"].map(w=><div key={w} className="cal-head">{w}</div>)}
+                    {cells.map((day, i)=>{
+                      if(!day) return <div key={"e"+i}></div>;
+                      const b = bl.includes(day.d), w = ws.includes(day.d);
+                      return (
+                        <div key={day.d}
+                          className={"mini-day" + (day.holidayName?" holiday":(day.isWE?" we":"")) + (b?" blocked":"") + (w?" wish":"")}
+                          title={day.d + "." + month + "." + (day.holidayName ? " " + day.holidayName : "") + (b ? " – gesperrt" : (w ? " – Wunschtag" : ""))}
+                          onClick={()=>cycleDay(pid, day.d)}>
+                          {day.d}{b ? " ✕" : ""}{w ? " ✓" : ""}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>}
+              </div>
+            );
+          })}
+        </div>}
+
+        {wishView==="matrix" &&
+        <div className="matrix-wrap">
+          <table className="matrix">
+            <thead>
+              <tr>
+                <th className="pname">Person</th>
+                {days.map(day=>(
+                  <th key={day.d} className={"dayhead" + (day.holidayName?" holiday":(day.isWE?" we":""))}
+                      title={day.holidayName || ""}>
+                    <span className="wd">{WD_SHORT[day.wd]}</span>{day.d}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {participants.map(pid=>{
+                const p = personById[pid]; if(!p) return null;
+                const bl = (m.blocked||{})[pid] || [];
+                const ws = (m.wishes||{})[pid] || [];
+                return (
+                  <tr key={pid}>
+                    <td className="pname">
+                      <span className={"amp " + ampelFor(pid)} style={{marginRight:"0.4rem", verticalAlign:"-1px"}}></span>
+                      <span className="dept-dot" style={{background:deptById[p.deptId]?deptById[p.deptId].color:"#999"}}></span>{p.name}
+                    </td>
+                    {days.map(day=>{
+                      const b = bl.includes(day.d), w = ws.includes(day.d);
+                      return (
+                        <td key={day.d}
+                          className={"daycell" + (day.holidayName?" holiday":(day.isWE?" we":"")) + (b?" blocked":"") + (w?" wish":"")}
+                          title={p.name + " – " + day.d + "." + month + "." + (b ? " gesperrt" : (w ? " Wunschtag" : ""))}
+                          onClick={()=>cycleDay(pid, day.d)}>
+                          {w ? "✓" : "✕"}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>}
+      </div>}
+
+      {m.plan &&
+      <div className="card">
+        <h2>Dienstplan {MONTH_NAMES[month-1]} {year}{isFinal && <span className="chip final-chip" style={{marginLeft:"0.6rem"}}>FINAL</span>}</h2>
+        <div className="cal-grid">
+          {["Mo","Di","Mi","Do","Fr","Sa","So"].map(w=><div key={w} className="cal-head">{w}</div>)}
+          {cells.map((day, i)=>{
+            if(!day) return <div key={"e"+i} className="cal-day empty-cell"></div>;
+            const t = m.plan[day.d] || {ruf:null, ber:null};
+            const hasConflict = !t.ruf || !t.ber;
+            const covered = day.special ? prioCovered(day.d) : true;
+            return (
+              <div key={day.d} className={"cal-day" + (day.holidayName?" holiday":(day.isWE?" we":"")) + (hasConflict?" conflict":"")}>
+                <div className="cal-daynum">
+                  <span className="mono">{day.d}</span>
+                  {day.holidayName && <span className="htag" title={day.holidayName}>{day.holidayName}</span>}
+                  {day.special && prio &&
+                    <span className="oudot" style={{color: covered ? "var(--accent)" : "var(--warn)"}}
+                      title={prio.name + (covered ? " vertreten (inkl. Bereitschafts-Übernacht)" : " an diesem Tag nicht vertreten")}>
+                      {covered ? "●" : "○"}
+                    </span>}
+                  {day.isWE && !day.holidayName && <span className="wetag">WE</span>}
+                </div>
+                {["ruf","ber"].map(slot=>{
+                  const pid = t[slot];
+                  const dp = pid && personById[pid] ? deptById[personById[pid].deptId] : null;
+                  return (
+                    <div className="slot" key={slot}>
+                      <span className="slot-label">{slot==="ruf" ? "Ruf" : "Bereitschaft"}</span>
+                      <select value={pid || ""} className={pid ? "" : "unset"}
+                        style={pid && dp ? {borderLeftColor: dp.color} : {}}
+                        onChange={e=>setSlot(day.d, slot, e.target.value)}>
+                        <option value="">— unbesetzt —</option>
+                        {participants.map(cid=>{
+                          const cp = personById[cid]; if(!cp) return null;
+                          const v = cid===pid ? [] : violations(cid, day.d, slot);
+                          return <option key={cid} value={cid} title={v.join(", ")}>
+                            {cp.name}{v.length ? " ⚠ ("+v.join(", ")+")" : ""}
+                          </option>;
+                        })}
+                      </select>
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })}
+        </div>
+        <div className="legend">
+          {state.departments.map(dp=>(
+            <span key={dp.id} className="chip"><span className="dept-dot" style={{background:dp.color, marginRight:0}}></span>{dp.name}{dp.priority ? " (Priorität WE)" : ""}</span>
+          ))}
+          <span className="chip">● = Prioritätsabteilung präsent</span>
+          <span className="chip" style={{background:"var(--holiday-bg)"}}>Feiertag</span>
+        </div>
+
+        {conflicts.length>0 &&
+          <div className="conflict-box">
+            <strong>{conflicts.length} unbesetzte{conflicts.length===1?"r":""} Dienst{conflicts.length===1?"":"e"}.</strong>{" "}
+            Diese Tage konnten regelkonform nicht besetzt werden. Der Assistent zeigt je Lücke die Kandidaten mit den geringsten Regelverletzungen – ein Klick trägt die Person ein:
+            {conflicts.map(c=>{
+              const suggs = suggestionsFor(c.d, c.slot);
+              return (
+                <div key={c.d + c.slot} style={{marginTop:"0.35rem"}}>
+                  <strong>{c.d}.{month}. {c.slot==="ruf"?"Rufdienst":"Bereitschaft"}:</strong>{" "}
+                  {suggs.length===0 && <em>keine Kandidaten ohne Sperrtag verfügbar</em>}
+                  {suggs.map(sg=>(
+                    <button key={sg.pid} className="sugg-btn" onClick={()=>setSlot(c.d, c.slot, sg.pid)}>
+                      {personById[sg.pid].name}{sg.v.length ? " ⚠ " + sg.v.join(", ") : " (regelkonform)"}
+                    </button>
+                  ))}
+                </div>
+              );
+            })}
+          </div>}
+        {conflicts.length===0 &&
+          <div className="ok-box">Alle Dienste sind besetzt. Manuelle Anpassungen sind über die Auswahlfelder jederzeit möglich.</div>}
+      </div>}
+
+      {m.plan &&
+      <div className="card">
+        <h2>Dienste tauschen</h2>
+        <p className="hint">Wähle zwei Dienste aus. Die App prüft, ob der Tausch regelkonform ist, und führt ihn auf Wunsch aus.</p>
+        <div className="flexrow">
+          <select value={swapA} onChange={e=>{setSwapA(e.target.value); setSwapMsg(null);}}>
+            <option value="">Dienst 1 wählen …</option>
+            {allAssignments.map(a=><option key={a.key} value={a.key}>{a.label}</option>)}
+          </select>
+          <span className="muted">⇄</span>
+          <select value={swapB} onChange={e=>{setSwapB(e.target.value); setSwapMsg(null);}}>
+            <option value="">Dienst 2 wählen …</option>
+            {allAssignments.map(a=><option key={a.key} value={a.key}>{a.label}</option>)}
+          </select>
+          <button className="btn secondary small" onClick={checkSwap}>Prüfen</button>
+          {swapMsg && swapMsg.apply && <button className="btn small" onClick={applySwap}>Tauschen</button>}
+        </div>
+        {swapMsg && <p style={{marginTop:"0.6rem", fontSize:"0.86rem", color: swapMsg.ok ? "var(--accent)" : "var(--warn)"}}>{swapMsg.text}</p>}
+      </div>}
+
+      {!m.plan && participants.length>0 &&
+        <div className="card">
+          <p className="muted" style={{fontSize:"0.9rem"}}>Wenn Auswahl, Sperr- und Wunschtage stehen, erstellt „Plan generieren" den Dienstplan. Der Generator probiert mehrere hundert Varianten und wählt die beste Verteilung.</p>
+        </div>}
+      </div>
+
+      {/* ---------- Druckansicht ---------- */}
+      {m.plan &&
+      <div className="print-sheet">
+        <h1>Dienstplan {MONTH_NAMES[month-1]} {year}</h1>
+        <div className="psub">Ruf- und Bereitschaftsdienste · Stand {new Date().toLocaleDateString("de-DE")}</div>
+        <table>
+          <thead><tr><th>Datum</th><th>Tag</th><th>Rufdienst</th><th>Abteilung</th><th>Bereitschaftsdienst</th><th>Abteilung</th></tr></thead>
+          <tbody>
+            {days.map(day=>{
+              const t = m.plan[day.d] || {};
+              const pr = t.ruf && personById[t.ruf], pb = t.ber && personById[t.ber];
+              return (
+                <tr key={day.d} className={(day.special?"pwe":"") + ((!t.ruf || !t.ber)?" pconf":"")}>
+                  <td>{String(day.d).padStart(2,"0")}.{String(month).padStart(2,"0")}.</td>
+                  <td>{WD_SHORT[day.wd]}{day.holidayName ? " · " + day.holidayName : ""}</td>
+                  <td>{pr ? pr.name : "— unbesetzt —"}</td>
+                  <td>{pr ? deptName(pr.deptId) : ""}</td>
+                  <td>{pb ? pb.name : "— unbesetzt —"}</td>
+                  <td>{pb ? deptName(pb.deptId) : ""}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+        <div className="pfoot">Bereitschaftsdienst jeweils bis zum Folgemorgen. Grau hinterlegt: Wochenende/Feiertag.</div>
+      </div>}
+    </div>
+  );
+}
+
+/* ---------- Statistik ---------- */
+
+function StatsTab({state, monthKey, setMonthKey}){
+  const stats = computeStats(state, monthKey);
+  const {year, month} = parseMonthKey(monthKey);
+  const m = state.months[monthKey];
+  const deptById = {}; state.departments.forEach(d=>deptById[d.id]=d);
+  const [statsYear, setStatsYear] = useState(year);
+  const yearStats = computeYearStats(state, statsYear);
+
+  return (
+    <div>
+      <div className="card">
+        <div className="toolbar">
+          <label style={{fontSize:"0.9rem", fontWeight:600}}>Monat&nbsp;
+            <input type="month" value={monthKey} onChange={e=>{ if(e.target.value) setMonthKey(e.target.value); }}/>
+          </label>
+          <div className="head-spacer"></div>
+          <button className="btn secondary" onClick={()=>exportExcel(state, monthKey)} disabled={!stats}>Excel-Export</button>
+        </div>
+      </div>
+
+      {!stats && <div className="card"><p className="muted" style={{fontSize:"0.9rem"}}>Für {MONTH_NAMES[month-1]} {year} liegt noch kein generierter Plan vor.</p></div>}
+
+      {stats && <>
+      <div className="card">
+        <h2>Dienste pro Person · {MONTH_NAMES[month-1]} {year}</h2>
+        <p className="hint">Über „ICS" lädt jede Person ihre Dienste als Kalenderdatei für Handy oder Outlook herunter.</p>
+        <table>
+          <thead><tr><th>Person</th><th>Fachabteilung</th><th>Ruf</th><th>Bereitschaft</th><th>Werktag</th><th>WE/Feiertag</th><th>davon Feiertag</th><th>Gesamt</th><th></th></tr></thead>
+          <tbody>
+            {state.people.filter(p=> (m.participants||[]).includes(p.id)).map(p=>{
+              const st = stats.perPerson[p.id];
+              const dp = deptById[p.deptId];
+              return (
+                <tr key={p.id}>
+                  <td>{p.name}</td>
+                  <td><span className="dept-dot" style={{background:dp?dp.color:"#999"}}></span>{dp?dp.name:""}</td>
+                  <td className="stat-num">{st.ruf}</td>
+                  <td className="stat-num">{st.ber}</td>
+                  <td className="stat-num">{st.werktag}</td>
+                  <td className="stat-num">{st.we}</td>
+                  <td className="stat-num">{st.feiertag}</td>
+                  <td className="stat-num" style={{fontWeight:600}}>{st.total}</td>
+                  <td><button className="btn secondary small" disabled={st.total===0}
+                    onClick={()=>exportICS(state, monthKey, p.id)}>ICS</button></td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="card">
+        <h2>Dienste pro Fachabteilung</h2>
+        <table>
+          <thead><tr><th>Fachabteilung</th><th>Ruf</th><th>Bereitschaft</th><th>Werktag</th><th>WE/Feiertag</th><th>davon Feiertag</th><th>Gesamt</th></tr></thead>
+          <tbody>
+            {state.departments.map(dp=>{
+              const st = stats.perDept[dp.id];
+              return (
+                <tr key={dp.id}>
+                  <td><span className="dept-dot" style={{background:dp.color}}></span>{dp.name}{dp.priority?" (Priorität WE)":""}</td>
+                  <td className="stat-num">{st.ruf}</td>
+                  <td className="stat-num">{st.ber}</td>
+                  <td className="stat-num">{st.werktag}</td>
+                  <td className="stat-num">{st.we}</td>
+                  <td className="stat-num">{st.feiertag}</td>
+                  <td className="stat-num" style={{fontWeight:600}}>{st.total}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+      </>}
+
+      <div className="card">
+        <h2>Jahresstatistik</h2>
+        <div className="flexrow" style={{marginBottom:"0.7rem"}}>
+          <label style={{fontSize:"0.88rem"}}>Jahr&nbsp;
+            <input type="number" min="2020" max="2100" value={statsYear} style={{width:"5.5rem"}}
+              onChange={e=>setStatsYear(Number(e.target.value)||year)}/>
+          </label>
+        </div>
+        {!yearStats && <p className="muted" style={{fontSize:"0.88rem"}}>Für {statsYear} liegen noch keine generierten Pläne vor.</p>}
+        {yearStats &&
+        <table>
+          <thead><tr><th>Person</th><th>Monate</th><th>Ruf</th><th>Bereitschaft</th><th>Werktag</th><th>WE/Feiertag</th><th>davon Feiertag</th><th>Gesamt</th></tr></thead>
+          <tbody>
+            {state.people.map(p=>{
+              const st = yearStats[p.id];
+              if(!st || st.total===0) return null;
+              return (
+                <tr key={p.id}>
+                  <td>{p.name}</td>
+                  <td className="stat-num">{st.months}</td>
+                  <td className="stat-num">{st.ruf}</td>
+                  <td className="stat-num">{st.ber}</td>
+                  <td className="stat-num">{st.werktag}</td>
+                  <td className="stat-num">{st.we}</td>
+                  <td className="stat-num">{st.feiertag}</td>
+                  <td className="stat-num" style={{fontWeight:600}}>{st.total}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>}
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Wünsche erfassen (Mitarbeiter-Ansicht) ---------- */
+
+function WishTab({state}){
+  const [pid, setPid] = useState("");
+  const [freeName, setFreeName] = useState("");
+  const [mk, setMk] = useState(defaultMonthKey());
+  const [blocked, setBlocked] = useState([]);
+  const [wishes, setWishes] = useState([]);
+  const {year, month} = parseMonthKey(mk);
+  const days = buildDays(year, month);
+
+  useEffect(()=>{ setBlocked([]); setWishes([]); }, [mk, pid]);
+
+  function cycle(d){
+    if(blocked.includes(d)){ setBlocked(blocked.filter(x=>x!==d)); setWishes(wishes.concat([d])); }
+    else if(wishes.includes(d)){ setWishes(wishes.filter(x=>x!==d)); }
+    else { setBlocked(blocked.concat([d])); }
+  }
+  function doExport(){
+    const person = state.people.find(p=>p.id===pid);
+    const name = person ? person.name : freeName.trim();
+    if(!name){ alert("Bitte Name auswählen oder eintragen."); return; }
+    const payload = {
+      type:"dienstwunsch", monthKey:mk,
+      personId: person ? person.id : null,
+      personName: name,
+      blocked: blocked.slice().sort((a,b)=>a-b),
+      wishes: wishes.slice().sort((a,b)=>a-b)
+    };
+    download("Wunsch_" + name.replace(/\s+/g,"_") + "_" + mk + ".json", JSON.stringify(payload, null, 2), "application/json");
+  }
+
+  const firstWd = (days[0].wd + 6) % 7;
+  const cells = [];
+  for(let i=0;i<firstWd;i++) cells.push(null);
+  days.forEach(day=>cells.push(day));
+  while(cells.length % 7 !== 0) cells.push(null);
+
+  return (
+    <div>
+      <div className="card">
+        <h2>Dienstwünsche abgeben</h2>
+        <p className="hint">Für Mitarbeiter: Name und Monat wählen, dann Tage anklicken – einmal für „kann nicht" (✕), zweimal für „Wunschtag" (✓), dreimal zum Zurücksetzen. Anschließend „Wünsche exportieren" und die Datei an die Dienstplanung schicken. Keine markierten Tage bedeutet keine Einschränkung.</p>
+        <div className="flexrow" style={{marginBottom:"0.8rem"}}>
+          <select value={pid} onChange={e=>setPid(e.target.value)}>
+            <option value="">Name wählen …</option>
+            {state.people.filter(p=>p.active).map(p=><option key={p.id} value={p.id}>{p.name}</option>)}
+          </select>
+          {!pid && <input type="text" placeholder="… oder Name eintragen" value={freeName} onChange={e=>setFreeName(e.target.value)}/>}
+          <input type="month" value={mk} onChange={e=>{ if(e.target.value) setMk(e.target.value); }}/>
+        </div>
+        <div className="cal-grid" style={{maxWidth:"40rem"}}>
+          {["Mo","Di","Mi","Do","Fr","Sa","So"].map(w=><div key={w} className="cal-head">{w}</div>)}
+          {cells.map((day, i)=>{
+            if(!day) return <div key={"e"+i} className="cal-day empty-cell" style={{minHeight:"2.6rem"}}></div>;
+            const b = blocked.includes(day.d), w = wishes.includes(day.d);
+            return (
+              <div key={day.d}
+                className={"cal-day" + (day.holidayName?" holiday":(day.isWE?" we":""))}
+                style={{minHeight:"2.6rem", cursor:"pointer", alignItems:"center", justifyContent:"center",
+                  background: b ? "var(--ink)" : (w ? "var(--wish-bg)" : undefined),
+                  color: b ? "#fff" : (w ? "var(--wish)" : undefined), fontWeight: (b||w)?700:400}}
+                title={day.holidayName || ""}
+                onClick={()=>cycle(day.d)}>
+                <span className="mono" style={{fontSize:"0.85rem"}}>{day.d}{b?" ✕":""}{w?" ✓":""}</span>
+              </div>
+            );
+          })}
+        </div>
+        <div style={{marginTop:"0.9rem"}}>
+          <button className="btn" onClick={doExport}>Wünsche exportieren</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
 </script>
-<div id="install-hint">
-<button class="ih-close" id="ih-close">✕</button>
-<div class="ih-icon">📲</div>
-<div class="ih-title">FNK Padel als App installieren</div>
-<div class="ih-text" id="ih-text">Tippe auf <strong>Teilen</strong> ↗ und dann <strong>"Zum Home-Bildschirm"</strong></div>
-</div>
 </body>
 </html>

@@ -1,0 +1,1645 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dienstplan Chirurgie</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#20313A; --ink-soft:#51636D; --paper:#F4F6F5; --card:#FFFFFF;
+    --line:#DCE3E2; --line-soft:#EAEEED;
+    --accent:#2F7061; --accent-soft:#E4EFEC;
+    --wish:#2F7061; --wish-bg:#DDEEE8;
+    --warn:#A8650F; --warn-bg:#FCF2DF; --warn-line:#E8CFA4;
+    --we-bg:#EEF3F1; --holiday-bg:#EDE9F3;
+    --danger:#9C3B31;
+    --radius:10px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{font-size:15px;}
+  body{
+    font-family:'Instrument Sans', system-ui, sans-serif;
+    background:var(--paper); color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+  }
+  .mono{font-family:'Spline Sans Mono', monospace;}
+  button{font-family:inherit; cursor:pointer;}
+  input, select{font-family:inherit; font-size:0.95rem;}
+
+  header{
+    background:var(--ink); color:#F2F5F4;
+    padding:0.9rem 1.4rem;
+    display:flex; align-items:center; gap:1.2rem; flex-wrap:wrap;
+  }
+  header h1{font-size:1.05rem; font-weight:600; letter-spacing:0.02em;}
+  header h1 span{color:#9BC3B8; font-weight:400;}
+  .head-spacer{flex:1;}
+  .head-btn{
+    background:transparent; color:#C8D5D1; border:1px solid #46585F;
+    border-radius:7px; padding:0.35rem 0.75rem; font-size:0.82rem;
+  }
+  .head-btn:hover{color:#fff; border-color:#7A8D93;}
+
+  nav{
+    background:var(--card); border-bottom:1px solid var(--line);
+    display:flex; padding:0 1.4rem; gap:0.2rem; flex-wrap:wrap;
+  }
+  nav button{
+    background:none; border:none; border-bottom:2.5px solid transparent;
+    padding:0.75rem 1rem; font-size:0.92rem; color:var(--ink-soft); font-weight:500;
+  }
+  nav button.active{color:var(--accent); border-bottom-color:var(--accent); font-weight:600;}
+  nav button:hover{color:var(--ink);}
+
+  main{max-width:1200px; margin:0 auto; padding:1.4rem;}
+
+  .card{
+    background:var(--card); border:1px solid var(--line);
+    border-radius:var(--radius); padding:1.1rem 1.2rem; margin-bottom:1.1rem;
+  }
+  .card h2{font-size:0.95rem; font-weight:600; margin-bottom:0.7rem;}
+  .card .hint{font-size:0.82rem; color:var(--ink-soft); margin-bottom:0.7rem; line-height:1.45;}
+
+  .btn{
+    background:var(--accent); color:#fff; border:none; border-radius:8px;
+    padding:0.5rem 1rem; font-size:0.9rem; font-weight:600;
+  }
+  .btn:hover{filter:brightness(1.07);}
+  .btn:disabled{opacity:0.45; cursor:default;}
+  .btn.secondary{background:var(--card); color:var(--ink); border:1px solid var(--line);}
+  .btn.secondary:hover{border-color:var(--ink-soft); filter:none;}
+  .btn.small{padding:0.3rem 0.65rem; font-size:0.82rem; font-weight:500;}
+  .btn.danger{background:none; border:none; color:var(--danger); font-size:0.82rem; padding:0.2rem 0.4rem;}
+
+  input[type=text], input[type=number], input[type=month], select{
+    border:1px solid var(--line); border-radius:7px; padding:0.42rem 0.6rem;
+    background:#fff; color:var(--ink);
+  }
+  input:focus, select:focus, button:focus-visible{outline:2px solid var(--accent); outline-offset:1px;}
+
+  table{border-collapse:collapse; width:100%;}
+  th{font-size:0.76rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--ink-soft); font-weight:600; text-align:left; padding:0.4rem 0.55rem; border-bottom:1.5px solid var(--line);}
+  td{padding:0.45rem 0.55rem; border-bottom:1px solid var(--line-soft); font-size:0.9rem; vertical-align:middle;}
+
+  .dept-dot{display:inline-block; width:0.7rem; height:0.7rem; border-radius:3px; margin-right:0.45rem; vertical-align:-1px;}
+  .chip{
+    display:inline-flex; align-items:center; gap:0.35rem;
+    font-size:0.82rem; padding:0.15rem 0.5rem; border-radius:6px;
+    background:var(--line-soft);
+  }
+
+  /* ---------- Sperr-/Wunschtage-Matrix ---------- */
+  .matrix-wrap{overflow-x:auto; border:1px solid var(--line); border-radius:8px;}
+  .matrix{border-collapse:collapse;}
+  .matrix th, .matrix td{border:1px solid var(--line-soft); padding:0;}
+  .matrix th{padding:0.3rem 0.4rem; background:#FBFCFC; position:sticky; top:0;}
+  .matrix .pname{
+    position:sticky; left:0; background:var(--card); padding:0.35rem 0.6rem;
+    font-size:0.85rem; white-space:nowrap; z-index:2; border-right:1.5px solid var(--line);
+  }
+  .matrix .daycell{
+    width:2rem; height:2rem; text-align:center; cursor:pointer; user-select:none;
+    font-size:0.72rem; color:transparent; background:#fff;
+  }
+  .matrix .daycell.we{background:var(--we-bg);}
+  .matrix .daycell.holiday{background:var(--holiday-bg);}
+  .matrix .daycell:hover{outline:1.5px solid var(--accent); outline-offset:-1.5px;}
+  .matrix .daycell.blocked{background:var(--ink); color:#fff;}
+  .matrix .daycell.wish{background:var(--wish-bg); color:var(--wish); font-weight:700;}
+  .matrix .dayhead{font-size:0.68rem; text-align:center; min-width:2rem;}
+  .matrix .dayhead.we{background:var(--we-bg);}
+  .matrix .dayhead.holiday{background:var(--holiday-bg);}
+  .matrix .dayhead .wd{display:block; color:var(--ink-soft); font-weight:500;}
+
+  /* ---------- Kalender ---------- */
+  .cal-grid{display:grid; grid-template-columns:repeat(7, 1fr); gap:6px;}
+  .cal-head{font-size:0.72rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--ink-soft); text-align:center; padding-bottom:2px; font-weight:600;}
+  .cal-day{
+    border:1px solid var(--line); border-radius:8px; background:#fff;
+    min-height:6.4rem; padding:0.4rem; display:flex; flex-direction:column; gap:0.3rem;
+  }
+  .cal-day.empty-cell{border:none; background:transparent;}
+  .cal-day.we{background:var(--we-bg); border-color:#CBD8D3;}
+  .cal-day.holiday{background:var(--holiday-bg); border-color:#CFC7DE;}
+  .cal-day.conflict{background:var(--warn-bg); border-color:var(--warn-line);}
+  .cal-daynum{font-size:0.8rem; font-weight:600; display:flex; justify-content:space-between; align-items:center; gap:0.3rem;}
+  .cal-daynum .wetag{font-size:0.6rem; font-weight:600; color:var(--accent); letter-spacing:0.04em; white-space:nowrap;}
+  .cal-daynum .htag{font-size:0.6rem; font-weight:600; color:#6B5A93; letter-spacing:0.02em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .cal-daynum .oudot{font-size:0.62rem; font-weight:600;}
+  .slot{display:flex; flex-direction:column; gap:1px;}
+  .slot-label{font-size:0.6rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--ink-soft); font-weight:600;}
+  .slot select{
+    width:100%; font-size:0.78rem; padding:0.2rem 0.3rem; border-radius:5px;
+    border:1px solid var(--line); background:#fff;
+    border-left-width:4px;
+  }
+  .slot select.unset{border-left-color:var(--warn); background:#FFFDF7; color:var(--warn); font-weight:600;}
+
+  .legend{display:flex; gap:1rem; flex-wrap:wrap; font-size:0.8rem; color:var(--ink-soft); margin-top:0.7rem;}
+  .legend .chip{background:#fff; border:1px solid var(--line);}
+
+  .conflict-box{
+    background:var(--warn-bg); border:1px solid var(--warn-line); border-radius:8px;
+    padding:0.7rem 0.9rem; font-size:0.86rem; color:#6E4508; margin-top:0.9rem; line-height:1.6;
+  }
+  .conflict-box .sugg-btn{
+    background:#fff; border:1px solid var(--warn-line); border-radius:6px;
+    padding:0.12rem 0.5rem; font-size:0.8rem; color:#6E4508; margin:0.1rem 0.15rem;
+  }
+  .conflict-box .sugg-btn:hover{border-color:var(--warn);}
+  .ok-box{
+    background:var(--accent-soft); border:1px solid #C4DCD5; border-radius:8px;
+    padding:0.7rem 0.9rem; font-size:0.86rem; color:#1F5045; margin-top:0.9rem;
+  }
+
+  .toolbar{display:flex; gap:0.6rem; flex-wrap:wrap; align-items:center;}
+  .stat-num{font-family:'Spline Sans Mono', monospace; font-size:0.88rem;}
+  .muted{color:var(--ink-soft);}
+  .flexrow{display:flex; gap:0.6rem; flex-wrap:wrap; align-items:center;}
+
+  .person-check{display:flex; align-items:center; gap:0.5rem; padding:0.3rem 0.55rem; border:1px solid var(--line); border-radius:7px; background:#fff; font-size:0.86rem; cursor:pointer;}
+  .person-check input{accent-color:var(--accent);}
+  .person-check.off{opacity:0.5;}
+
+  /* ---------- Personenliste (Akkordeon) & Ampel ---------- */
+  .amp{display:inline-block; width:0.72rem; height:0.72rem; border-radius:50%; flex:none;}
+  .amp.g{background:#2E9E63;}
+  .amp.y{background:#E0A72E;}
+  .amp.r{background:#C5493A;}
+  .acc{border:1px solid var(--line); border-radius:8px; margin-bottom:0.45rem; background:#fff; overflow:hidden;}
+  .acc-head{display:flex; align-items:center; gap:0.6rem; padding:0.5rem 0.7rem; cursor:pointer; user-select:none; flex-wrap:wrap;}
+  .acc-head:hover{background:var(--line-soft);}
+  .acc-head .cnt{font-size:0.78rem; color:var(--ink-soft);}
+  .acc-done{font-size:0.8rem; display:flex; gap:0.3rem; align-items:center; cursor:pointer; white-space:nowrap;}
+  .acc-done input{accent-color:var(--accent);}
+  .acc-body{padding:0.6rem 0.7rem 0.8rem; border-top:1px solid var(--line-soft); background:#FBFCFC;}
+  .mini-day{
+    min-height:2.4rem; border:1px solid var(--line); border-radius:7px; background:#fff;
+    display:flex; align-items:center; justify-content:center; cursor:pointer; user-select:none;
+    font-family:'Spline Sans Mono', monospace; font-size:0.82rem;
+  }
+  .mini-day.we{background:var(--we-bg);}
+  .mini-day.holiday{background:var(--holiday-bg);}
+  .mini-day:hover{outline:1.5px solid var(--accent); outline-offset:-1.5px;}
+  .mini-day.blocked{background:var(--ink); color:#fff; border-color:var(--ink); font-weight:700;}
+  .mini-day.wish{background:var(--wish-bg); color:var(--wish); font-weight:700;}
+  .final-chip{background:var(--accent-soft); color:#1F5045; font-weight:600; border:1px solid #C4DCD5;}
+
+  /* ---------- Druckansicht ---------- */
+  .print-sheet{display:none;}
+  @media print{
+    header, nav, .no-print{display:none !important;}
+    body{background:#fff;}
+    main{max-width:none; padding:0;}
+    .print-sheet{display:block !important; font-size:10.5pt;}
+    .print-sheet h1{font-size:15pt; margin-bottom:2mm;}
+    .print-sheet .psub{font-size:9pt; color:#444; margin-bottom:4mm;}
+    .print-sheet table{width:100%; border-collapse:collapse;}
+    .print-sheet th, .print-sheet td{border:0.5pt solid #999; padding:1.2mm 2mm; font-size:9.5pt; text-align:left;}
+    .print-sheet th{background:#EDEDED; text-transform:none; letter-spacing:0; color:#000;}
+    .print-sheet tr.pwe td{background:#F0F0F0;}
+    .print-sheet tr.pconf td{background:#FBEED3;}
+    .print-sheet .pfoot{font-size:8pt; color:#555; margin-top:3mm;}
+  }
+
+  @media (max-width:780px){
+    .cal-grid{grid-template-columns:1fr;}
+    .cal-day.empty-cell{display:none;}
+    .cal-head{display:none;}
+    .cal-day{min-height:auto;}
+  }
+  @media (prefers-reduced-motion:no-preference){
+    .cal-day, .btn{transition:background 0.12s ease, border-color 0.12s ease;}
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" data-presets="env,react">
+const {useState, useEffect, useMemo, useRef} = React;
+
+/* =====================  Konstanten & Hilfsfunktionen  ===================== */
+
+const STORAGE_KEY = "dienstplan-chirurgie-v3";
+const WD_SHORT = ["So","Mo","Di","Mi","Do","Fr","Sa"];
+const MONTH_NAMES = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
+const DEPT_COLORS = ["#2F7061","#3F6E92","#8A5784","#B07C2A","#5E7B3B","#A85252"];
+
+function uid(){ return Math.random().toString(36).slice(2,10); }
+
+function defaultState(){
+  const D = {ou:"ou", tho:"tho", ach:"ach", kin:"kin", pla:"pla"};
+  const P = (name, deptId, slots)=>({id:uid(), name, deptId, active:true, maxServices:null, slots: slots||"beide"});
+  return {
+    departments: [
+      {id:D.ou, name:"Orthopädie / Unfallchirurgie", color:DEPT_COLORS[0], priority:true},
+      {id:D.tho, name:"Thoraxchirurgie", color:DEPT_COLORS[1], priority:false},
+      {id:D.ach, name:"Allgemeinchirurgie", color:DEPT_COLORS[2], priority:false},
+      {id:D.kin, name:"Kinderchirurgie", color:DEPT_COLORS[3], priority:false},
+      {id:D.pla, name:"Plastische Chirurgie", color:DEPT_COLORS[4], priority:false},
+    ],
+    people: [
+      P("Istvan Benedek", D.ou),
+      P("Antonia Moser", D.ou),
+      P("Jona Bäcker", D.ou, "ruf"),
+      P("Sara Fell", D.ou),
+      P("Vladimir Mitrovic", D.ou),
+      P("Daniel Pliev", D.ou, "ruf"),
+      P("Marcel Rohde", D.ou),
+      P("Alice Soprani", D.ou),
+      P("Merve Deniz", D.tho),
+      P("Seyran Duran", D.tho),
+      P("Maria Camilla Vedovelli", D.tho),
+      P("Jung Koh", D.tho),
+      P("Clara Hülser", D.ach),
+      P("Fenny Tanjaya", D.ach),
+      P("Larissa Wahlefeld", D.ach),
+      P("Laura Contreras Henk", D.kin),
+      P("Rebecca Kastl", D.kin),
+      P("Bianca Heusch", D.pla),
+      P("Alexander Schroeder-Finckh", D.pla),
+      P("Charlotte Weinmann", D.pla),
+    ],
+    rules: { maxServices:5, maxWeekends:1, fairnessMonths:3 },
+    months: {}
+  };
+}
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){ const s = JSON.parse(raw); if(s && s.departments && s.people){
+      if(!s.rules.fairnessMonths) s.rules.fairnessMonths = 3;
+      s.people.forEach(p=>{ if(!p.slots) p.slots = "beide"; });
+      return s;
+    }}
+    // Migration von v2: nur übernehmen, wenn dort bereits Personen angelegt wurden
+    const old = localStorage.getItem("dienstplan-chirurgie-v2");
+    if(old){ const s = JSON.parse(old);
+      if(s && s.departments && s.people && s.people.length){
+        if(!s.rules.fairnessMonths) s.rules.fairnessMonths = 3;
+        s.people.forEach(p=>{ if(!p.slots) p.slots = "beide"; });
+        return s;
+      } }
+  }catch(e){}
+  return defaultState();
+}
+
+function defaultMonthKey(){
+  const now = new Date();
+  const t = new Date(now.getFullYear(), now.getMonth()+2, 1); // übernächster Monat
+  return t.getFullYear() + "-" + String(t.getMonth()+1).padStart(2,"0");
+}
+
+function parseMonthKey(key){
+  const [y,m] = key.split("-").map(Number);
+  return {year:y, month:m};
+}
+
+/* ---------- Feiertage NRW ---------- */
+
+function easterSunday(y){
+  const a=y%19, b=Math.floor(y/100), c=y%100, d=Math.floor(b/4), e=b%4,
+        f=Math.floor((b+8)/25), g=Math.floor((b-f+1)/3), h=(19*a+b-d-g+15)%30,
+        i=Math.floor(c/4), k=c%4, l=(32+2*e+2*i-h-k)%7,
+        m2=Math.floor((a+11*h+22*l)/451),
+        mo=Math.floor((h+l-7*m2+114)/31), da=((h+l-7*m2+114)%31)+1;
+  return new Date(y, mo-1, da);
+}
+
+function nrwHolidays(year){
+  const map = {};
+  const put = (dt, name)=>{ map[(dt.getMonth()+1)+"-"+dt.getDate()] = name; };
+  put(new Date(year,0,1), "Neujahr");
+  put(new Date(year,4,1), "Tag der Arbeit");
+  put(new Date(year,9,3), "Tag der Dt. Einheit");
+  put(new Date(year,10,1), "Allerheiligen");
+  put(new Date(year,11,25), "1. Weihnachtstag");
+  put(new Date(year,11,26), "2. Weihnachtstag");
+  const easter = easterSunday(year);
+  const off = (n)=>{ const d = new Date(easter); d.setDate(d.getDate()+n); return d; };
+  put(off(-2), "Karfreitag");
+  put(off(1), "Ostermontag");
+  put(off(39), "Christi Himmelfahrt");
+  put(off(50), "Pfingstmontag");
+  put(off(60), "Fronleichnam");
+  return map;
+}
+
+function buildDays(year, month){
+  const hol = nrwHolidays(year);
+  const n = new Date(year, month, 0).getDate();
+  const days = [];
+  for(let d=1; d<=n; d++){
+    const wd = new Date(year, month-1, d).getDay();
+    const isWE = wd===5 || wd===6 || wd===0;
+    const holidayName = hol[month+"-"+d] || null;
+    days.push({d, wd, isWE, holidayName, special: isWE || !!holidayName});
+  }
+  return days;
+}
+
+/* "Wochenendgruppen" = zusammenhängende Blöcke aus Fr/Sa/So und Feiertagen */
+function weekendGroups(days){
+  const groups = [];
+  let cur = null;
+  for(const day of days){
+    if(day.special){
+      if(!cur) cur = [];
+      cur.push(day.d);
+    }else{
+      if(cur){ groups.push(cur); cur = null; }
+    }
+  }
+  if(cur) groups.push(cur);
+  return groups;
+}
+
+function dayWeekendGroupIndex(groups, d){
+  for(let i=0;i<groups.length;i++){ if(groups[i].includes(d)) return i; }
+  return null;
+}
+
+function personMax(person, rules){
+  return (person && person.maxServices) ? person.maxServices : rules.maxServices;
+}
+
+/* Belastung der Vormonate für die faire Verteilung */
+function pastLoad(state, monthKey){
+  const load = {};
+  state.people.forEach(p=> load[p.id] = {total:0, special:0});
+  const keys = Object.keys(state.months)
+    .filter(k=> k < monthKey && state.months[k] && state.months[k].plan)
+    .sort().reverse().slice(0, state.rules.fairnessMonths || 3);
+  keys.forEach(k=>{
+    const {year, month} = parseMonthKey(k);
+    const days = buildDays(year, month);
+    const plan = state.months[k].plan;
+    days.forEach(day=>{
+      const t = plan[day.d]; if(!t) return;
+      [t.ruf, t.ber].forEach(pid=>{
+        if(pid && load[pid]){ load[pid].total++; if(day.special) load[pid].special++; }
+      });
+    });
+  });
+  return load;
+}
+
+/* =====================  Plan-Generator  ===================== */
+
+function generatePlan({days, groups, participants, blocked, wishes, people, departments, rules, past}){
+  const prioDept = departments.find(dp=>dp.priority);
+  const prioId = prioDept ? prioDept.id : null;
+  const personById = {}; people.forEach(p=>personById[p.id]=p);
+  const deptOf = pid => personById[pid] ? personById[pid].deptId : null;
+  const maxOf = pid => personMax(personById[pid], rules);
+  const canSlot = (pid, slot)=>{
+    const sp = (personById[pid] && personById[pid].slots) || "beide";
+    return sp==="beide" || sp===slot;
+  };
+  const isWish = (pid, d)=> !!(wishes && wishes[pid] && wishes[pid].includes(d));
+  past = past || {};
+  const pastOf = pid => past[pid] || {total:0, special:0};
+
+  let best = null, bestScore = Infinity;
+  const ITER = 800;
+
+  for(let iter=0; iter<ITER; iter++){
+    const res = attempt();
+    const sc = scorePlan(res);
+    if(sc < bestScore){ bestScore = sc; best = res; }
+  }
+  return best;
+
+  function attempt(){
+    const plan = {};
+    days.forEach(day=> plan[day.d] = {ruf:null, ber:null});
+    const counts = {}, assigned = {}, weGrp = {};
+    participants.forEach(pid=>{ counts[pid]=0; assigned[pid]=new Set(); weGrp[pid]=new Set(); });
+
+    function baseChecks(pid, d){
+      if(counts[pid] >= maxOf(pid)) return false;
+      if(blocked[pid] && blocked[pid].includes(d)) return false;
+      if(assigned[pid].has(d) || assigned[pid].has(d-1) || assigned[pid].has(d+1)) return false;
+      return true;
+    }
+    function can(pid, d){
+      if(!baseChecks(pid, d)) return false;
+      const g = dayWeekendGroupIndex(groups, d);
+      if(g!==null && !weGrp[pid].has(g) && weGrp[pid].size >= rules.maxWeekends) return false;
+      return true;
+    }
+    /* Weiche Variante: erlaubt ein zusätzliches Wochenende, wenn sonst nichts geht */
+    function canRelaxed(pid, d){
+      return baseChecks(pid, d);
+    }
+    function assign(pid, d, slot){
+      plan[d][slot] = pid;
+      counts[pid]++; assigned[pid].add(d);
+      const g = dayWeekendGroupIndex(groups, d);
+      if(g!==null) weGrp[pid].add(g);
+    }
+    function shuffled(arr){
+      const a = arr.slice();
+      for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+      return a;
+    }
+    /* Basisbewertung eines Kandidaten: weniger ist besser */
+    function baseScore(pid, d, special){
+      let s = counts[pid]*100 + pastOf(pid).total*6;
+      if(special) s += pastOf(pid).special*25;
+      if(isWish(pid, d)) s -= 90;
+      let gap = 99;
+      assigned[pid].forEach(x=>{ gap = Math.min(gap, Math.abs(x - d)); });
+      s -= Math.min(gap, 14)*4;
+      return s + Math.random()*10;
+    }
+    function pickBest(cands, d, special, bonusFn){
+      let bp = null, bs = Infinity;
+      for(const p of cands){
+        let s = baseScore(p, d, special);
+        if(bonusFn) s += bonusFn(p);
+        if(s < bs){ bs = s; bp = p; }
+      }
+      return bp;
+    }
+
+    /* --- 1. Wochenend- und Feiertagsblöcke zuerst (Reihenfolge pro Versuch zufällig) --- */
+    shuffled(groups.slice()).forEach(grp=>{
+      if(grp.length >= 3){
+        const f = grp[0], sa = grp[1], so = grp[2];
+        // B: erster Tag Bereitschaft + dritter Tag Ruf, bevorzugt Prioritätsabteilung (benötigt beide Dienstarten)
+        let candFS = participants.filter(p=> canSlot(p,"ruf") && canSlot(p,"ber") && can(p,f) && can(p,so));
+        const B = pickBest(candFS, f, true, p=> deptOf(p)===prioId ? -200 : 0);
+        if(B){ assign(B, f, "ber"); assign(B, so, "ruf"); }
+        // A: erster Tag Ruf + dritter Tag Bereitschaft, bevorzugt andere Abteilung als B
+        candFS = participants.filter(p=> canSlot(p,"ruf") && canSlot(p,"ber") && can(p,f) && can(p,so));
+        const A = pickBest(candFS, f, true, p=> (B && deptOf(p)===deptOf(B)) ? 120 : 0);
+        if(A){ assign(A, f, "ruf"); assign(A, so, "ber"); }
+        // Fehlende Slots am ersten/dritten Tag einzeln (Block-Personen bevorzugen)
+        [["ruf",f],["ber",f],["ruf",so],["ber",so]].forEach(([slot,d])=>{
+          if(!plan[d][slot]){
+            const c = pickBest(participants.filter(p=> canSlot(p,slot) && can(p,d) && plan[d].ruf!==p && plan[d].ber!==p),
+              d, true, p=> (weGrp[p].has(dayWeekendGroupIndex(groups, d)) ? -500 : 0) + ((deptOf(p)===prioId && !dayCoveredByPrio(plan, d)) ? -200 : 0));
+            if(c) assign(c, d, slot);
+          }
+        });
+        // Mittlerer Tag: fehlende Abteilungen bevorzugen
+        const usedDepts = new Set([plan[f].ruf, plan[f].ber, plan[so].ruf, plan[so].ber]
+          .filter(Boolean).map(deptOf));
+        const C = pickBest(participants.filter(p=> canSlot(p,"ruf") && can(p,sa)), sa, true,
+          p=> (usedDepts.has(deptOf(p)) ? 100 : -60) + (canSlot(p,"ber") ? 0 : -40));
+        if(C){ assign(C, sa, "ruf"); usedDepts.add(deptOf(C)); }
+        const D = pickBest(participants.filter(p=> canSlot(p,"ber") && can(p,sa) && plan[sa].ruf!==p), sa, true,
+          p=> usedDepts.has(deptOf(p)) ? 100 : -60);
+        if(D) assign(D, sa, "ber");
+        // Zusatztage im Block (z. B. Feiertagsmontag): Block-Personen stark bevorzugen
+        grp.slice(3).forEach(d=>{
+          ["ruf","ber"].forEach(slot=>{
+            if(plan[d][slot]) return;
+            const c = pickBest(participants.filter(p=> canSlot(p,slot) && can(p,d) && plan[d].ruf!==p && plan[d].ber!==p),
+              d, true, p=> (weGrp[p].has(dayWeekendGroupIndex(groups, d)) ? -500 : 0) + ((deptOf(p)===prioId && !dayCoveredByPrio(plan, d)) ? -800 : 0));
+            if(c) assign(c, d, slot);
+          });
+        });
+      }else{
+        // Kurzer Block (z. B. Einzel-Feiertag oder Monatsrand): Tag für Tag
+        grp.forEach(d=>{
+          ["ruf","ber"].forEach(slot=>{
+            if(plan[d][slot]) return;
+            const c = pickBest(participants.filter(p=> canSlot(p,slot) && can(p,d) && plan[d].ruf!==p && plan[d].ber!==p),
+              d, true, p=> (weGrp[p].has(dayWeekendGroupIndex(groups, d)) ? -500 : 0) + ((deptOf(p)===prioId && !dayCoveredByPrio(plan, d)) ? -200 : 0));
+            if(c) assign(c, d, slot);
+          });
+        });
+      }
+    });
+
+    /* --- 2. Werktage (zufällige Reihenfolge, damit Neustarts Engpässe auflösen) --- */
+    shuffled(days.filter(day=>!day.special)).forEach(day=>{
+      ["ruf","ber"].forEach(slot=>{
+        if(plan[day.d][slot]) return;
+        const cands = participants.filter(p=> canSlot(p,slot) && can(p, day.d) && plan[day.d].ruf!==p && plan[day.d].ber!==p);
+        const c = pickBest(cands, day.d, false, null);
+        if(c) assign(c, day.d, slot);
+      });
+    });
+
+    /* --- 3. Reparatur: verbliebene Lücken notfalls mit gelockertem Wochenendlimit füllen --- */
+    days.forEach(day=>{
+      ["ruf","ber"].forEach(slot=>{
+        if(plan[day.d][slot]) return;
+        const cands = participants.filter(p=> canSlot(p,slot) && canRelaxed(p, day.d) && plan[day.d].ruf!==p && plan[day.d].ber!==p);
+        const c = pickBest(cands, day.d, !!day.special,
+          p=> (deptOf(p)===prioId && day.special && !dayCoveredByPrio(plan, day.d)) ? -300 : 0);
+        if(c) assign(c, day.d, slot);
+      });
+    });
+
+    return {plan, counts};
+  }
+
+  function dayCoveredByPrio(plan, d){
+    if(!prioId) return true;
+    const t = plan[d];
+    if(t && ((t.ruf && deptOf(t.ruf)===prioId) || (t.ber && deptOf(t.ber)===prioId))) return true;
+    const prev = plan[d-1];
+    if(prev && prev.ber && deptOf(prev.ber)===prioId) return true; // Bereitschaft bis zum Folgemorgen
+    return false;
+  }
+
+  function scorePlan(res){
+    const {plan, counts} = res;
+    let s = 0;
+    days.forEach(day=>{
+      if(!plan[day.d].ruf) s += 10000;
+      if(!plan[day.d].ber) s += 10000;
+    });
+    groups.forEach(grp=> grp.forEach(d=>{ if(!dayCoveredByPrio(plan, d)) s += 900; }));
+    // zweites Wochenende pro Person: erlaubt, aber deutlich bestraft (nur als letztes Mittel)
+    participants.forEach(pid=>{
+      const gset = new Set();
+      groups.forEach((grp, gi)=> grp.forEach(d=>{
+        if(plan[d].ruf===pid || plan[d].ber===pid) gset.add(gi);
+      }));
+      if(gset.size > rules.maxWeekends) s += (gset.size - rules.maxWeekends) * 700;
+    });
+    groups.forEach(grp=>{
+      const present = new Set();
+      grp.forEach(d=>{ ["ruf","ber"].forEach(sl=>{ const p=plan[d][sl]; if(p) present.add(deptOf(p)); }); });
+      departments.forEach(dp=>{ if(!dp.priority && !present.has(dp.id)) s += 150; });
+    });
+    // gleichmäßige Verteilung inkl. Vormonats-Last
+    const adj = participants.map(p=> counts[p] + pastOf(p).total*0.4);
+    if(adj.length){
+      const avg = adj.reduce((a,b)=>a+b,0)/adj.length;
+      s += adj.reduce((a,v)=> a + (v-avg)*(v-avg), 0) * 15;
+    }
+    // große Lücken belohnen, erfüllte Wünsche belohnen
+    participants.forEach(pid=>{
+      const ds = days.filter(day=> plan[day.d].ruf===pid || plan[day.d].ber===pid).map(day=>day.d).sort((a,b)=>a-b);
+      for(let i=1;i<ds.length;i++){
+        const gap = ds[i]-ds[i-1];
+        if(gap < 5) s += (5-gap)*25;
+      }
+      ds.forEach(d=>{ if(isWish(pid, d)) s -= 35; });
+    });
+    return s;
+  }
+}
+
+/* =====================  Statistik  ===================== */
+
+function computeStats(state, monthKey){
+  const m = state.months[monthKey];
+  if(!m || !m.plan) return null;
+  const {year, month} = parseMonthKey(monthKey);
+  const days = buildDays(year, month);
+  const perPerson = {};
+  state.people.forEach(p=>{
+    perPerson[p.id] = {ruf:0, ber:0, werktag:0, we:0, feiertag:0, total:0};
+  });
+  days.forEach(day=>{
+    const t = m.plan[day.d]; if(!t) return;
+    [["ruf", t.ruf],["ber", t.ber]].forEach(([slot,pid])=>{
+      if(!pid || !perPerson[pid]) return;
+      perPerson[pid][slot]++;
+      perPerson[pid][day.special ? "we" : "werktag"]++;
+      if(day.holidayName) perPerson[pid].feiertag++;
+      perPerson[pid].total++;
+    });
+  });
+  const perDept = {};
+  state.departments.forEach(dp=> perDept[dp.id] = {ruf:0, ber:0, werktag:0, we:0, feiertag:0, total:0});
+  state.people.forEach(p=>{
+    const st = perPerson[p.id];
+    if(perDept[p.deptId]){
+      ["ruf","ber","werktag","we","feiertag","total"].forEach(k=> perDept[p.deptId][k] += st[k]);
+    }
+  });
+  return {perPerson, perDept, days};
+}
+
+function computeYearStats(state, year){
+  const perPerson = {};
+  state.people.forEach(p=> perPerson[p.id] = {ruf:0, ber:0, werktag:0, we:0, feiertag:0, total:0, months:0});
+  let any = false;
+  Object.keys(state.months).forEach(k=>{
+    if(!k.startsWith(String(year)+"-")) return;
+    const st = computeStats(state, k);
+    if(!st) return;
+    any = true;
+    state.people.forEach(p=>{
+      const s = st.perPerson[p.id]; if(!s) return;
+      ["ruf","ber","werktag","we","feiertag","total"].forEach(kk=> perPerson[p.id][kk] += s[kk]);
+      if(s.total>0) perPerson[p.id].months++;
+    });
+  });
+  return any ? perPerson : null;
+}
+
+/* =====================  Exporte  ===================== */
+
+function download(filename, content, mime){
+  const blob = new Blob([content], {type:mime});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function exportExcel(state, monthKey){
+  const m = state.months[monthKey];
+  const stats = computeStats(state, monthKey);
+  if(!m || !m.plan || !stats){ alert("Bitte zuerst einen Plan generieren."); return; }
+  const {year, month} = parseMonthKey(monthKey);
+  const days = buildDays(year, month);
+  const pName = pid => { const p = state.people.find(x=>x.id===pid); return p ? p.name : ""; };
+  const deptName = id => { const d = state.departments.find(x=>x.id===id); return d ? d.name : ""; };
+  const pDept = pid => { const p = state.people.find(x=>x.id===pid); return p ? deptName(p.deptId) : ""; };
+
+  const rows1 = [["Datum","Tag","Feiertag","Rufdienst","Abteilung (Ruf)","Bereitschaftsdienst","Abteilung (Bereitschaft)"]];
+  days.forEach(day=>{
+    const t = m.plan[day.d] || {};
+    rows1.push([
+      String(day.d).padStart(2,"0") + "." + String(month).padStart(2,"0") + "." + year,
+      WD_SHORT[day.wd],
+      day.holidayName || "",
+      t.ruf ? pName(t.ruf) : "— unbesetzt —",
+      t.ruf ? pDept(t.ruf) : "",
+      t.ber ? pName(t.ber) : "— unbesetzt —",
+      t.ber ? pDept(t.ber) : ""
+    ]);
+  });
+
+  const head2 = ["","Fachabteilung","Rufdienste","Bereitschaftsdienste","Werktagsdienste","Wochenend-/Feiertagsdienste","davon Feiertage","Gesamt"];
+  const rows2 = [["Person"].concat(head2.slice(1))];
+  state.people.filter(p=> (m.participants||[]).includes(p.id)).forEach(p=>{
+    const st = stats.perPerson[p.id];
+    rows2.push([p.name, deptName(p.deptId), st.ruf, st.ber, st.werktag, st.we, st.feiertag, st.total]);
+  });
+  rows2.push([]);
+  rows2.push(["Fachabteilung","","Rufdienste","Bereitschaftsdienste","Werktagsdienste","Wochenend-/Feiertagsdienste","davon Feiertage","Gesamt"]);
+  state.departments.forEach(dp=>{
+    const st = stats.perDept[dp.id];
+    rows2.push([dp.name, "", st.ruf, st.ber, st.werktag, st.we, st.feiertag, st.total]);
+  });
+
+  const wb = XLSX.utils.book_new();
+  const ws1 = XLSX.utils.aoa_to_sheet(rows1);
+  ws1["!cols"] = [{wch:12},{wch:5},{wch:18},{wch:22},{wch:26},{wch:22},{wch:26}];
+  const ws2 = XLSX.utils.aoa_to_sheet(rows2);
+  ws2["!cols"] = [{wch:24},{wch:26},{wch:11},{wch:18},{wch:15},{wch:24},{wch:14},{wch:8}];
+  XLSX.utils.book_append_sheet(wb, ws1, "Dienstplan");
+  XLSX.utils.book_append_sheet(wb, ws2, "Statistik");
+  XLSX.writeFile(wb, "Dienstplan_" + MONTH_NAMES[month-1] + "_" + year + ".xlsx");
+}
+
+function exportICS(state, monthKey, pid){
+  const m = state.months[monthKey];
+  if(!m || !m.plan) return;
+  const {year, month} = parseMonthKey(monthKey);
+  const days = buildDays(year, month);
+  const p = state.people.find(x=>x.id===pid);
+  if(!p) return;
+  const fmt = d => String(year) + String(month).padStart(2,"0") + String(d).padStart(2,"0");
+  const nextDay = d =>{
+    const dt = new Date(year, month-1, d+1);
+    return String(dt.getFullYear()) + String(dt.getMonth()+1).padStart(2,"0") + String(dt.getDate()).padStart(2,"0");
+  };
+  const stamp = new Date().toISOString().replace(/[-:]/g,"").split(".")[0] + "Z";
+  const lines = ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Dienstplan Chirurgie//DE","CALSCALE:GREGORIAN"];
+  days.forEach(day=>{
+    const t = m.plan[day.d]; if(!t) return;
+    [["ruf","Rufdienst"],["ber","Bereitschaftsdienst"]].forEach(([slot,label])=>{
+      if(t[slot]!==pid) return;
+      lines.push("BEGIN:VEVENT");
+      lines.push("UID:" + monthKey + "-" + day.d + "-" + slot + "-" + pid + "@dienstplan");
+      lines.push("DTSTAMP:" + stamp);
+      lines.push("DTSTART;VALUE=DATE:" + fmt(day.d));
+      lines.push("DTEND;VALUE=DATE:" + nextDay(day.d));
+      lines.push("SUMMARY:" + label);
+      if(slot==="ber") lines.push("DESCRIPTION:Bereitschaftsdienst – Anwesenheit bis zum Folgemorgen");
+      lines.push("END:VEVENT");
+    });
+  });
+  lines.push("END:VCALENDAR");
+  download("Dienste_" + p.name.replace(/\s+/g,"_") + "_" + monthKey + ".ics", lines.join("\r\n"), "text/calendar");
+}
+
+/* =====================  App  ===================== */
+
+function App(){
+  const [state, setState] = useState(loadState);
+  const [tab, setTab] = useState(state.people.length ? "planung" : "team");
+  const [monthKey, setMonthKey] = useState(defaultMonthKey());
+  const fileRef = useRef(null);
+
+  useEffect(()=>{
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+  }, [state]);
+
+  function update(fn){ setState(prev=>{ const next = JSON.parse(JSON.stringify(prev)); fn(next); return next; }); }
+
+  function exportJSON(){
+    download("dienstplan-daten.json", JSON.stringify(state, null, 2), "application/json");
+  }
+  function importJSON(ev){
+    const file = ev.target.files[0]; if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      try{
+        const s = JSON.parse(reader.result);
+        if(!s.departments || !s.people) throw new Error("Format");
+        if(!s.rules.fairnessMonths) s.rules.fairnessMonths = 3;
+        setState(s);
+        alert("Daten wurden importiert.");
+      }catch(e){ alert("Die Datei konnte nicht gelesen werden. Bitte einen gültigen Export wählen."); }
+    };
+    reader.readAsText(file);
+    ev.target.value = "";
+  }
+
+  return (
+    <div>
+      <header>
+        <h1>Dienstplan <span>· Ruf- und Bereitschaftsdienste</span></h1>
+        <div className="head-spacer"></div>
+        <button className="head-btn" onClick={exportJSON}>Daten sichern (JSON)</button>
+        <button className="head-btn" onClick={()=>fileRef.current.click()}>Daten laden</button>
+        <input ref={fileRef} type="file" accept=".json" style={{display:"none"}} onChange={importJSON}/>
+      </header>
+      <nav>
+        <button className={tab==="team"?"active":""} onClick={()=>setTab("team")}>Team &amp; Regeln</button>
+        <button className={tab==="planung"?"active":""} onClick={()=>setTab("planung")}>Monatsplanung</button>
+        <button className={tab==="statistik"?"active":""} onClick={()=>setTab("statistik")}>Statistik</button>
+        <button className={tab==="wunsch"?"active":""} onClick={()=>setTab("wunsch")}>Wünsche erfassen</button>
+      </nav>
+      <main>
+        {tab==="team" && <div className="no-print"><TeamTab state={state} update={update}/></div>}
+        {tab==="planung" && <PlanTab state={state} update={update} monthKey={monthKey} setMonthKey={setMonthKey}/>}
+        {tab==="statistik" && <div className="no-print"><StatsTab state={state} monthKey={monthKey} setMonthKey={setMonthKey}/></div>}
+        {tab==="wunsch" && <div className="no-print"><WishTab state={state}/></div>}
+      </main>
+    </div>
+  );
+}
+
+/* ---------- Team & Regeln ---------- */
+
+function TeamTab({state, update}){
+  const [newName, setNewName] = useState("");
+  const [newDept, setNewDept] = useState(state.departments[0] ? state.departments[0].id : "");
+
+  function addPerson(){
+    const name = newName.trim();
+    if(!name || !newDept) return;
+    update(s=> s.people.push({id:uid(), name, deptId:newDept, active:true, maxServices:null, slots:"beide"}));
+    setNewName("");
+  }
+
+  return (
+    <div>
+      <div className="card">
+        <h2>Fachabteilungen</h2>
+        <p className="hint">Die Abteilung mit Wochenend-Priorität soll an jedem Wochenend- und Feiertagstag vertreten sein. Ein Bereitschaftsdienst deckt dabei auch den Folgemorgen ab.</p>
+        <table>
+          <thead><tr><th>Name</th><th>Farbe</th><th>Wochenend-Priorität</th><th></th></tr></thead>
+          <tbody>
+            {state.departments.map(dp=>(
+              <tr key={dp.id}>
+                <td><input type="text" value={dp.name} style={{width:"100%", maxWidth:"20rem"}}
+                  onChange={e=>update(s=>{ s.departments.find(x=>x.id===dp.id).name = e.target.value; })}/></td>
+                <td><input type="color" value={dp.color} style={{width:"2.4rem", height:"1.7rem", border:"1px solid var(--line)", borderRadius:"5px", padding:"1px"}}
+                  onChange={e=>update(s=>{ s.departments.find(x=>x.id===dp.id).color = e.target.value; })}/></td>
+                <td><input type="radio" name="prio" checked={dp.priority}
+                  onChange={()=>update(s=>{ s.departments.forEach(x=> x.priority = x.id===dp.id); })}/></td>
+                <td><button className="btn danger" onClick={()=>{
+                  if(state.people.some(p=>p.deptId===dp.id)){ alert("Dieser Abteilung sind noch Personen zugeordnet."); return; }
+                  update(s=>{ s.departments = s.departments.filter(x=>x.id!==dp.id); });
+                }}>Entfernen</button></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <div style={{marginTop:"0.7rem"}}>
+          <button className="btn secondary small" onClick={()=>update(s=>{
+            s.departments.push({id:uid(), name:"Neue Abteilung", color:DEPT_COLORS[s.departments.length % DEPT_COLORS.length], priority:false});
+          })}>Abteilung hinzufügen</button>
+        </div>
+      </div>
+
+      <div className="card">
+        <h2>Diensthabende</h2>
+        <p className="hint">Inaktive Personen bleiben gespeichert, werden aber bei neuen Monaten nicht vorausgewählt. Ein individuelles Maximum überschreibt die allgemeine Obergrenze (z. B. für Teilzeit); leer bedeutet Standard.</p>
+        <div className="flexrow" style={{marginBottom:"0.8rem"}}>
+          <input type="text" placeholder="Name" value={newName} onChange={e=>setNewName(e.target.value)}
+            onKeyDown={e=>{ if(e.key==="Enter") addPerson(); }}/>
+          <select value={newDept} onChange={e=>setNewDept(e.target.value)}>
+            {state.departments.map(dp=><option key={dp.id} value={dp.id}>{dp.name}</option>)}
+          </select>
+          <button className="btn small" onClick={addPerson}>Hinzufügen</button>
+        </div>
+        {state.people.length===0 && <p className="muted" style={{fontSize:"0.88rem"}}>Noch keine Personen angelegt. Trage oben Name und Abteilung ein.</p>}
+        {state.people.length>0 &&
+        <table>
+          <thead><tr><th>Name</th><th>Fachabteilung</th><th>Dienstarten</th><th>Max. Dienste</th><th>Aktiv</th><th></th></tr></thead>
+          <tbody>
+            {state.people.map(p=>{
+              const dp = state.departments.find(x=>x.id===p.deptId);
+              return (
+                <tr key={p.id} style={{opacity:p.active?1:0.55}}>
+                  <td><input type="text" value={p.name} style={{maxWidth:"13rem"}}
+                    onChange={e=>update(s=>{ s.people.find(x=>x.id===p.id).name = e.target.value; })}/></td>
+                  <td>
+                    <span className="dept-dot" style={{background:dp?dp.color:"#999"}}></span>
+                    <select value={p.deptId} onChange={e=>update(s=>{ s.people.find(x=>x.id===p.id).deptId = e.target.value; })}>
+                      {state.departments.map(d2=><option key={d2.id} value={d2.id}>{d2.name}</option>)}
+                    </select>
+                  </td>
+                  <td>
+                    <select value={p.slots || "beide"} onChange={e=>update(s=>{ s.people.find(x=>x.id===p.id).slots = e.target.value; })}>
+                      <option value="beide">Ruf + Bereitschaft</option>
+                      <option value="ruf">Nur Rufdienst</option>
+                      <option value="ber">Nur Bereitschaft</option>
+                    </select>
+                  </td>
+                  <td><input type="number" min="1" max="15" placeholder={String(state.rules.maxServices)}
+                    value={p.maxServices || ""} style={{width:"4.2rem"}}
+                    onChange={e=>update(s=>{ s.people.find(x=>x.id===p.id).maxServices = e.target.value ? Math.max(1, Number(e.target.value)) : null; })}/></td>
+                  <td><input type="checkbox" checked={p.active}
+                    onChange={e=>update(s=>{ s.people.find(x=>x.id===p.id).active = e.target.checked; })}/></td>
+                  <td><button className="btn danger" onClick={()=>{
+                    if(confirm(p.name + " wirklich löschen?")) update(s=>{ s.people = s.people.filter(x=>x.id!==p.id); });
+                  }}>Löschen</button></td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>}
+      </div>
+
+      <div className="card">
+        <h2>Regeln</h2>
+        <div className="flexrow">
+          <label style={{fontSize:"0.88rem"}}>Maximale Dienste pro Person und Monat&nbsp;
+            <input type="number" min="1" max="15" value={state.rules.maxServices} style={{width:"4.2rem"}}
+              onChange={e=>update(s=>{ s.rules.maxServices = Math.max(1, Number(e.target.value)||5); })}/>
+          </label>
+          <label style={{fontSize:"0.88rem"}}>Fairness: Vormonate berücksichtigen&nbsp;
+            <input type="number" min="0" max="12" value={state.rules.fairnessMonths} style={{width:"4.2rem"}}
+              onChange={e=>update(s=>{ s.rules.fairnessMonths = Math.max(0, Number(e.target.value)||0); })}/>
+          </label>
+        </div>
+        <p className="hint" style={{marginTop:"0.6rem", marginBottom:0}}>
+          Fest hinterlegt sind außerdem: pro Tag ein Ruf- und ein Bereitschaftsdienst von verschiedenen Personen, die Dienstart jeder Person, keine Dienste an aufeinanderfolgenden Tagen sowie möglichst große Abstände zwischen den Diensten. Gesetzliche Feiertage in NRW werden automatisch erkannt und wie Wochenendtage behandelt. Der Freitag/Sonntag-Tausch (Ruf ↔ Bereitschaft) und maximal ein Wochenend-/Feiertagsblock pro Person sind Optimierungsziele, keine harten Regeln: Wenn Sperr- und Wunschtage nichts anderes zulassen, mischt der Generator die Wochenendbesetzung freier und setzt Personen notfalls an einem zweiten Wochenende ein, damit alle Dienste besetzt werden. Wer in den Vormonaten viel gearbeitet hat, wird bei der Verteilung entlastet. Sperrtage werden immer eingehalten, Wunschtage bevorzugt vergeben. Lässt sich ein Tag trotz allem nicht besetzen, bleibt er frei und wird markiert.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Monatsplanung ---------- */
+
+function PlanTab({state, update, monthKey, setMonthKey}){
+  const {year, month} = parseMonthKey(monthKey);
+  const days = useMemo(()=>buildDays(year, month), [monthKey]);
+  const groups = useMemo(()=>weekendGroups(days), [days]);
+  const m = state.months[monthKey];
+  const wishFileRef = useRef(null);
+  const [swapA, setSwapA] = useState("");
+  const [swapB, setSwapB] = useState("");
+  const [swapMsg, setSwapMsg] = useState(null);
+  const [wishView, setWishView] = useState("liste");
+  const [openPid, setOpenPid] = useState(null);
+
+  useEffect(()=>{
+    if(!state.months[monthKey]){
+      update(s=>{
+        s.months[monthKey] = {
+          participants: s.people.filter(p=>p.active).map(p=>p.id),
+          blocked: {},
+          wishes: {},
+          wishStatus: {},
+          deadline: null,
+          plan: null
+        };
+      });
+    }
+  }, [monthKey]);
+  useEffect(()=>{ setSwapA(""); setSwapB(""); setSwapMsg(null); setOpenPid(null); }, [monthKey]);
+
+  if(!m) return null;
+  const participants = m.participants || [];
+  const personById = {}; state.people.forEach(p=>personById[p.id]=p);
+  const deptById = {}; state.departments.forEach(d=>deptById[d.id]=d);
+  const prio = state.departments.find(d=>d.priority);
+  const holidaysInMonth = days.filter(d=>d.holidayName);
+
+  function toggleParticipant(pid){
+    update(s=>{
+      const mm = s.months[monthKey];
+      if(mm.participants.includes(pid)) mm.participants = mm.participants.filter(x=>x!==pid);
+      else mm.participants.push(pid);
+    });
+  }
+  /* Zellen wechseln zwischen: frei → gesperrt → Wunsch → frei */
+  function cycleDay(pid, d){
+    update(s=>{
+      const mm = s.months[monthKey];
+      if(!mm.blocked[pid]) mm.blocked[pid] = [];
+      if(!mm.wishes) mm.wishes = {};
+      if(!mm.wishes[pid]) mm.wishes[pid] = [];
+      const bi = mm.blocked[pid].indexOf(d);
+      const wi = mm.wishes[pid].indexOf(d);
+      if(bi<0 && wi<0){ mm.blocked[pid].push(d); }
+      else if(bi>=0){ mm.blocked[pid].splice(bi,1); mm.wishes[pid].push(d); }
+      else { mm.wishes[pid].splice(wi,1); }
+    });
+  }
+  function setDone(pid, val){
+    update(s=>{
+      const mm = s.months[monthKey];
+      if(!mm.wishStatus) mm.wishStatus = {};
+      if(val) mm.wishStatus[pid] = true; else delete mm.wishStatus[pid];
+    });
+  }
+  function ampelFor(pid){
+    if(m.wishStatus && m.wishStatus[pid]) return "g";
+    const has = (((m.blocked||{})[pid])||[]).length + (((m.wishes||{})[pid])||[]).length;
+    return has > 0 ? "y" : "r";
+  }
+  const doneCount = participants.filter(pid=> m.wishStatus && m.wishStatus[pid]).length;
+  const todayStr = new Date().toISOString().slice(0,10);
+  const deadlinePassed = !!(m.deadline && todayStr > m.deadline);
+  const isFinal = (participants.length>0 && doneCount===participants.length) || deadlinePassed;
+  const fmtDate = iso => { if(!iso) return ""; const [y,mo,d] = iso.split("-"); return Number(d)+"."+Number(mo)+"."+y; };
+
+  function resetMonth(){
+    if(!confirm("Diesen Monat wirklich komplett zurücksetzen? Plan, Sperr-/Wunschtage, Status und Stichtag werden gelöscht.")) return;
+    update(s=>{
+      s.months[monthKey] = {
+        participants: s.people.filter(p=>p.active).map(p=>p.id),
+        blocked: {}, wishes: {}, wishStatus: {}, deadline: null, plan: null
+      };
+    });
+    setOpenPid(null); setSwapA(""); setSwapB(""); setSwapMsg(null);
+  }
+
+  function runGenerate(){
+    if(participants.length < 2){ alert("Bitte mindestens zwei Personen für diesen Monat auswählen."); return; }
+    if(m.plan && !confirm("Es existiert bereits ein Plan für diesen Monat. Neu generieren und überschreiben? Manuelle Änderungen gehen dabei verloren.")) return;
+    const res = generatePlan({
+      days, groups, participants,
+      blocked: m.blocked || {},
+      wishes: m.wishes || {},
+      people: state.people, departments: state.departments,
+      rules: state.rules,
+      past: pastLoad(state, monthKey)
+    });
+    update(s=>{ s.months[monthKey].plan = res.plan; });
+    setSwapMsg(null);
+  }
+  function setSlot(d, slot, pid){
+    update(s=>{
+      if(!s.months[monthKey].plan) return;
+      s.months[monthKey].plan[d][slot] = pid || null;
+    });
+  }
+
+  /* Regelverstöße einer hypothetischen Zuweisung (Slot selbst ausgenommen) */
+  function violations(pid, d, slot, planOverride){
+    const plan = planOverride || m.plan;
+    if(!plan) return [];
+    const v = [];
+    if(((m.blocked||{})[pid]||[]).includes(d)) v.push("Sperrtag");
+    const sp = (personById[pid] && personById[pid].slots) || "beide";
+    if(sp!=="beide" && sp!==slot) v.push(slot==="ruf" ? "macht nur Bereitschaft" : "macht nur Rufdienst");
+    let count = 0; const dsSet = new Set(); let weSet = new Set();
+    days.forEach(day=>{
+      ["ruf","ber"].forEach(sl=>{
+        if(day.d===d && sl===slot) return;
+        if(plan[day.d] && plan[day.d][sl]===pid){
+          count++; dsSet.add(day.d);
+          const g = dayWeekendGroupIndex(groups, day.d);
+          if(g!==null) weSet.add(g);
+        }
+      });
+    });
+    const max = personMax(personById[pid], state.rules);
+    if(count+1 > max) v.push("über " + max + " Dienste");
+    if(dsSet.has(d)) v.push("bereits an diesem Tag");
+    if(dsSet.has(d-1) || dsSet.has(d+1)) v.push("Folgetag-Konflikt");
+    const g = dayWeekendGroupIndex(groups, d);
+    if(g!==null){ weSet.add(g); if(weSet.size > state.rules.maxWeekends) v.push("zweiter WE-Block"); }
+    return v;
+  }
+
+  function prioCovered(d){
+    if(!m.plan || !prio) return true;
+    const isP = pid => pid && personById[pid] && personById[pid].deptId===prio.id;
+    const t = m.plan[d];
+    if(t && (isP(t.ruf) || isP(t.ber))) return true;
+    const prev = m.plan[d-1];
+    return !!(prev && isP(prev.ber));
+  }
+
+  /* Konflikt-Assistent: beste Kandidaten für einen leeren Slot */
+  function suggestionsFor(d, slot){
+    const otherSlot = slot==="ruf" ? "ber" : "ruf";
+    return participants
+      .filter(pid=> m.plan[d][otherSlot]!==pid)
+      .map(pid=> ({pid, v: violations(pid, d, slot)}))
+      .filter(x=> !x.v.includes("Sperrtag") && !x.v.includes("bereits an diesem Tag") && !x.v.some(s=>s.indexOf("macht nur")===0))
+      .sort((a,b)=> a.v.length - b.v.length)
+      .slice(0,3);
+  }
+
+  /* Wunsch-Dateien der Mitarbeiter einlesen */
+  function importWishes(ev){
+    const files = Array.from(ev.target.files || []);
+    if(!files.length) return;
+    let done = 0, fail = [];
+    files.forEach(file=>{
+      const reader = new FileReader();
+      reader.onload = ()=>{
+        try{
+          const w = JSON.parse(reader.result);
+          if(w.type!=="dienstwunsch" || !w.monthKey) throw new Error("Format");
+          let person = state.people.find(p=>p.id===w.personId);
+          if(!person && w.personName) person = state.people.find(p=>p.name.trim().toLowerCase()===w.personName.trim().toLowerCase());
+          if(!person){ fail.push(w.personName || file.name); }
+          else{
+            update(s=>{
+              if(!s.months[w.monthKey]) s.months[w.monthKey] = {participants: s.people.filter(p=>p.active).map(p=>p.id), blocked:{}, wishes:{}, wishStatus:{}, deadline:null, plan:null};
+              const mm = s.months[w.monthKey];
+              if(!mm.wishes) mm.wishes = {};
+              if(!mm.wishStatus) mm.wishStatus = {};
+              mm.blocked[person.id] = (w.blocked||[]).slice();
+              mm.wishes[person.id] = (w.wishes||[]).slice();
+              mm.wishStatus[person.id] = true;
+              if(!mm.participants.includes(person.id)) mm.participants.push(person.id);
+            });
+          }
+        }catch(e){ fail.push(file.name); }
+        done++;
+        if(done===files.length){
+          alert((files.length - fail.length) + " Wunsch-Datei(en) übernommen." + (fail.length ? " Nicht zuordenbar: " + fail.join(", ") : ""));
+        }
+      };
+      reader.readAsText(file);
+    });
+    ev.target.value = "";
+  }
+
+  /* Tauschfunktion */
+  const allAssignments = [];
+  if(m.plan){
+    days.forEach(day=>{
+      ["ruf","ber"].forEach(slot=>{
+        const pid = m.plan[day.d][slot];
+        if(pid && personById[pid]) allAssignments.push({
+          key: day.d + "|" + slot,
+          label: day.d + "." + month + ". " + (slot==="ruf"?"Ruf":"Bereitschaft") + " – " + personById[pid].name
+        });
+      });
+    });
+  }
+  function checkSwap(){
+    if(!swapA || !swapB || swapA===swapB){ setSwapMsg({ok:false, text:"Bitte zwei verschiedene Dienste auswählen."}); return; }
+    const [d1s, s1] = swapA.split("|"); const [d2s, s2] = swapB.split("|");
+    const d1 = Number(d1s), d2 = Number(d2s);
+    const p1 = m.plan[d1][s1], p2 = m.plan[d2][s2];
+    if(p1===p2){ setSwapMsg({ok:false, text:"Beide Dienste gehören derselben Person."}); return; }
+    const sim = JSON.parse(JSON.stringify(m.plan));
+    sim[d1][s1] = null; sim[d2][s2] = null;
+    const v1 = violations(p2, d1, s1, sim);
+    const v2 = violations(p1, d2, s2, sim);
+    const probs = [];
+    if(v1.length) probs.push(personById[p2].name + " am " + d1 + "." + month + ".: " + v1.join(", "));
+    if(v2.length) probs.push(personById[p1].name + " am " + d2 + "." + month + ".: " + v2.join(", "));
+    if(!probs.length) setSwapMsg({ok:true, text:"Der Tausch ist regelkonform.", apply:true});
+    else setSwapMsg({ok:false, text:"Der Tausch verletzt Regeln – " + probs.join(" · "), apply:true});
+  }
+  function applySwap(){
+    const [d1s, s1] = swapA.split("|"); const [d2s, s2] = swapB.split("|");
+    const d1 = Number(d1s), d2 = Number(d2s);
+    update(s=>{
+      const pl = s.months[monthKey].plan;
+      const tmp = pl[d1][s1]; pl[d1][s1] = pl[d2][s2]; pl[d2][s2] = tmp;
+    });
+    setSwapA(""); setSwapB(""); setSwapMsg({ok:true, text:"Getauscht."});
+  }
+
+  const conflicts = [];
+  if(m.plan){
+    days.forEach(day=>{
+      const t = m.plan[day.d];
+      if(!t || !t.ruf) conflicts.push({d:day.d, slot:"ruf"});
+      if(!t || !t.ber) conflicts.push({d:day.d, slot:"ber"});
+    });
+  }
+
+  const firstWd = (days[0].wd + 6) % 7;
+  const cells = [];
+  for(let i=0;i<firstWd;i++) cells.push(null);
+  days.forEach(day=>cells.push(day));
+  while(cells.length % 7 !== 0) cells.push(null);
+
+  const deptName = id => deptById[id] ? deptById[id].name : "";
+
+  return (
+    <div>
+      <div className="no-print">
+      <div className="card">
+        <div className="toolbar">
+          <label style={{fontSize:"0.9rem", fontWeight:600}}>Monat&nbsp;
+            <input type="month" value={monthKey} onChange={e=>{ if(e.target.value) setMonthKey(e.target.value); }}/>
+          </label>
+          <div className="head-spacer"></div>
+          <button className="btn secondary" onClick={()=>wishFileRef.current.click()}>Wünsche importieren</button>
+          <input ref={wishFileRef} type="file" accept=".json" multiple style={{display:"none"}} onChange={importWishes}/>
+          <button className="btn secondary" onClick={resetMonth}>Monat zurücksetzen</button>
+          <button className="btn" onClick={runGenerate}>Plan generieren</button>
+          <button className="btn secondary" onClick={()=>exportExcel(state, monthKey)} disabled={!m.plan}>Excel</button>
+          <button className="btn secondary" onClick={()=>window.print()} disabled={!m.plan}>Drucken</button>
+        </div>
+        {holidaysInMonth.length>0 &&
+          <p className="hint" style={{marginTop:"0.6rem", marginBottom:0}}>
+            Feiertage in diesem Monat (werden wie Wochenendtage behandelt): {holidaysInMonth.map(d=> d.d + "." + month + ". " + d.holidayName).join(", ")}.
+          </p>}
+        {state.rules.fairnessMonths>0 &&
+          <p className="hint" style={{marginTop:"0.4rem", marginBottom:0}}>
+            Zur fairen Verteilung fließt die Belastung der letzten {state.rules.fairnessMonths} generierten Monate ein.
+          </p>}
+        {(()=>{
+          const needed = groups.reduce((a,g)=> a + (g.length===1 ? 2 : 4), 0);
+          if(participants.length >= needed || participants.length===0) return null;
+          return <p className="hint" style={{marginTop:"0.4rem", marginBottom:0, color:"var(--warn)"}}>
+            Hinweis: Dieser Monat hat {groups.length} Wochenend-/Feiertagsblöcke, für die bei nur einem Block pro Person mindestens {needed} verschiedene Personen nötig wären. Ausgewählt sind {participants.length} – einzelne Personen werden daher voraussichtlich an einem zweiten Wochenende eingesetzt.
+          </p>;
+        })()}
+      </div>
+
+      <div className="card">
+        <h2>Wer kommt in {MONTH_NAMES[month-1]} für Dienste infrage?</h2>
+        {state.people.length===0 && <p className="muted" style={{fontSize:"0.88rem"}}>Lege zuerst unter „Team &amp; Regeln" die Diensthabenden an.</p>}
+        <div className="flexrow">
+          {state.people.map(p=>{
+            const on = participants.includes(p.id);
+            const dp = deptById[p.deptId];
+            return (
+              <label key={p.id} className={"person-check" + (on?"":" off")}>
+                <input type="checkbox" checked={on} onChange={()=>toggleParticipant(p.id)}/>
+                <span className="dept-dot" style={{background:dp?dp.color:"#999", marginRight:0}}></span>
+                {p.name}
+              </label>
+            );
+          })}
+        </div>
+      </div>
+
+      {participants.length>0 &&
+      <div className="card">
+        <h2>Sperr- und Wunschtage</h2>
+        <div className="flexrow" style={{marginBottom:"0.7rem"}}>
+          <label style={{fontSize:"0.86rem"}}>Stichtag für Wünsche&nbsp;
+            <input type="date" value={m.deadline||""} onChange={e=>update(s=>{ s.months[monthKey].deadline = e.target.value || null; })}/>
+          </label>
+          <span className={"chip" + (isFinal ? " final-chip" : "")}>
+            {doneCount} von {participants.length} abgeschlossen
+            {isFinal ? " · FINAL" : (m.deadline ? " · Stichtag " + fmtDate(m.deadline) : "")}
+          </span>
+          <div className="head-spacer"></div>
+          <button className={"btn small" + (wishView==="liste"?"":" secondary")} onClick={()=>setWishView("liste")}>Personenliste</button>
+          <button className={"btn small" + (wishView==="matrix"?"":" secondary")} onClick={()=>setWishView("matrix")}>Matrix</button>
+        </div>
+        <p className="hint">Einmal klicken sperrt einen Tag (✕, wird immer eingehalten), zweimal klicken macht ihn zum Wunschtag (✓, wird bevorzugt vergeben), dreimal klicken setzt ihn zurück. Alle Einträge bleiben pro Monat gespeichert – Wünsche können also nach und nach eintreffen und der Plan jederzeit neu generiert werden. Die Ampel zeigt den Stand: grün = vom Planer als abgeschlossen markiert, gelb = Einträge vorhanden, aber noch offen, rot = noch keine Einträge. Der Monat gilt als FINAL, sobald alle abgeschlossen sind oder der Stichtag verstrichen ist. Importierte Wunsch-Dateien setzen die Person automatisch auf abgeschlossen.</p>
+
+        {wishView==="liste" &&
+        <div>
+          {participants.map(pid=>{
+            const p = personById[pid]; if(!p) return null;
+            const bl = (m.blocked||{})[pid] || [];
+            const ws = (m.wishes||{})[pid] || [];
+            const done = !!(m.wishStatus && m.wishStatus[pid]);
+            const amp = ampelFor(pid);
+            const open = openPid===pid;
+            const dp = deptById[p.deptId];
+            return (
+              <div key={pid} className="acc">
+                <div className="acc-head" onClick={()=>setOpenPid(open ? null : pid)}
+                  title={amp==="g" ? "Einträge abgeschlossen" : (amp==="y" ? "Einträge vorhanden, noch offen" : "Noch keine Einträge")}>
+                  <span className={"amp " + amp}></span>
+                  <span className="dept-dot" style={{background: dp ? dp.color : "#999", marginRight:0}}></span>
+                  <strong style={{fontSize:"0.9rem"}}>{p.name}</strong>
+                  <span className="cnt">{bl.length} gesperrt · {ws.length} Wunsch{ws.length===1?"":"tage"}</span>
+                  <div className="head-spacer"></div>
+                  <label className="acc-done" onClick={e=>e.stopPropagation()}>
+                    <input type="checkbox" checked={done} onChange={e=>setDone(pid, e.target.checked)}/>
+                    abgeschlossen
+                  </label>
+                  <span className="muted">{open ? "▲" : "▼"}</span>
+                </div>
+                {open &&
+                <div className="acc-body">
+                  <div className="cal-grid" style={{maxWidth:"38rem"}}>
+                    {["Mo","Di","Mi","Do","Fr","Sa","So"].map(w=><div key={w} className="cal-head">{w}</div>)}
+                    {cells.map((day, i)=>{
+                      if(!day) return <div key={"e"+i}></div>;
+                      const b = bl.includes(day.d), w = ws.includes(day.d);
+                      return (
+                        <div key={day.d}
+                          className={"mini-day" + (day.holidayName?" holiday":(day.isWE?" we":"")) + (b?" blocked":"") + (w?" wish":"")}
+                          title={day.d + "." + month + "." + (day.holidayName ? " " + day.holidayName : "") + (b ? " – gesperrt" : (w ? " – Wunschtag" : ""))}
+                          onClick={()=>cycleDay(pid, day.d)}>
+                          {day.d}{b ? " ✕" : ""}{w ? " ✓" : ""}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>}
+              </div>
+            );
+          })}
+        </div>}
+
+        {wishView==="matrix" &&
+        <div className="matrix-wrap">
+          <table className="matrix">
+            <thead>
+              <tr>
+                <th className="pname">Person</th>
+                {days.map(day=>(
+                  <th key={day.d} className={"dayhead" + (day.holidayName?" holiday":(day.isWE?" we":""))}
+                      title={day.holidayName || ""}>
+                    <span className="wd">{WD_SHORT[day.wd]}</span>{day.d}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {participants.map(pid=>{
+                const p = personById[pid]; if(!p) return null;
+                const bl = (m.blocked||{})[pid] || [];
+                const ws = (m.wishes||{})[pid] || [];
+                return (
+                  <tr key={pid}>
+                    <td className="pname">
+                      <span className={"amp " + ampelFor(pid)} style={{marginRight:"0.4rem", verticalAlign:"-1px"}}></span>
+                      <span className="dept-dot" style={{background:deptById[p.deptId]?deptById[p.deptId].color:"#999"}}></span>{p.name}
+                    </td>
+                    {days.map(day=>{
+                      const b = bl.includes(day.d), w = ws.includes(day.d);
+                      return (
+                        <td key={day.d}
+                          className={"daycell" + (day.holidayName?" holiday":(day.isWE?" we":"")) + (b?" blocked":"") + (w?" wish":"")}
+                          title={p.name + " – " + day.d + "." + month + "." + (b ? " gesperrt" : (w ? " Wunschtag" : ""))}
+                          onClick={()=>cycleDay(pid, day.d)}>
+                          {w ? "✓" : "✕"}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>}
+      </div>}
+
+      {m.plan &&
+      <div className="card">
+        <h2>Dienstplan {MONTH_NAMES[month-1]} {year}{isFinal && <span className="chip final-chip" style={{marginLeft:"0.6rem"}}>FINAL</span>}</h2>
+        <div className="cal-grid">
+          {["Mo","Di","Mi","Do","Fr","Sa","So"].map(w=><div key={w} className="cal-head">{w}</div>)}
+          {cells.map((day, i)=>{
+            if(!day) return <div key={"e"+i} className="cal-day empty-cell"></div>;
+            const t = m.plan[day.d] || {ruf:null, ber:null};
+            const hasConflict = !t.ruf || !t.ber;
+            const covered = day.special ? prioCovered(day.d) : true;
+            return (
+              <div key={day.d} className={"cal-day" + (day.holidayName?" holiday":(day.isWE?" we":"")) + (hasConflict?" conflict":"")}>
+                <div className="cal-daynum">
+                  <span className="mono">{day.d}</span>
+                  {day.holidayName && <span className="htag" title={day.holidayName}>{day.holidayName}</span>}
+                  {day.special && prio &&
+                    <span className="oudot" style={{color: covered ? "var(--accent)" : "var(--warn)"}}
+                      title={prio.name + (covered ? " vertreten (inkl. Bereitschafts-Übernacht)" : " an diesem Tag nicht vertreten")}>
+                      {covered ? "●" : "○"}
+                    </span>}
+                  {day.isWE && !day.holidayName && <span className="wetag">WE</span>}
+                </div>
+                {["ruf","ber"].map(slot=>{
+                  const pid = t[slot];
+                  const dp = pid && personById[pid] ? deptById[personById[pid].deptId] : null;
+                  return (
+                    <div className="slot" key={slot}>
+                      <span className="slot-label">{slot==="ruf" ? "Ruf" : "Bereitschaft"}</span>
+                      <select value={pid || ""} className={pid ? "" : "unset"}
+                        style={pid && dp ? {borderLeftColor: dp.color} : {}}
+                        onChange={e=>setSlot(day.d, slot, e.target.value)}>
+                        <option value="">— unbesetzt —</option>
+                        {participants.map(cid=>{
+                          const cp = personById[cid]; if(!cp) return null;
+                          const v = cid===pid ? [] : violations(cid, day.d, slot);
+                          return <option key={cid} value={cid} title={v.join(", ")}>
+                            {cp.name}{v.length ? " ⚠ ("+v.join(", ")+")" : ""}
+                          </option>;
+                        })}
+                      </select>
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })}
+        </div>
+        <div className="legend">
+          {state.departments.map(dp=>(
+            <span key={dp.id} className="chip"><span className="dept-dot" style={{background:dp.color, marginRight:0}}></span>{dp.name}{dp.priority ? " (Priorität WE)" : ""}</span>
+          ))}
+          <span className="chip">● = Prioritätsabteilung präsent</span>
+          <span className="chip" style={{background:"var(--holiday-bg)"}}>Feiertag</span>
+        </div>
+
+        {conflicts.length>0 &&
+          <div className="conflict-box">
+            <strong>{conflicts.length} unbesetzte{conflicts.length===1?"r":""} Dienst{conflicts.length===1?"":"e"}.</strong>{" "}
+            Diese Tage konnten regelkonform nicht besetzt werden. Der Assistent zeigt je Lücke die Kandidaten mit den geringsten Regelverletzungen – ein Klick trägt die Person ein:
+            {conflicts.map(c=>{
+              const suggs = suggestionsFor(c.d, c.slot);
+              return (
+                <div key={c.d + c.slot} style={{marginTop:"0.35rem"}}>
+                  <strong>{c.d}.{month}. {c.slot==="ruf"?"Rufdienst":"Bereitschaft"}:</strong>{" "}
+                  {suggs.length===0 && <em>keine Kandidaten ohne Sperrtag verfügbar</em>}
+                  {suggs.map(sg=>(
+                    <button key={sg.pid} className="sugg-btn" onClick={()=>setSlot(c.d, c.slot, sg.pid)}>
+                      {personById[sg.pid].name}{sg.v.length ? " ⚠ " + sg.v.join(", ") : " (regelkonform)"}
+                    </button>
+                  ))}
+                </div>
+              );
+            })}
+          </div>}
+        {conflicts.length===0 &&
+          <div className="ok-box">Alle Dienste sind besetzt. Manuelle Anpassungen sind über die Auswahlfelder jederzeit möglich.</div>}
+      </div>}
+
+      {m.plan &&
+      <div className="card">
+        <h2>Dienste tauschen</h2>
+        <p className="hint">Wähle zwei Dienste aus. Die App prüft, ob der Tausch regelkonform ist, und führt ihn auf Wunsch aus.</p>
+        <div className="flexrow">
+          <select value={swapA} onChange={e=>{setSwapA(e.target.value); setSwapMsg(null);}}>
+            <option value="">Dienst 1 wählen …</option>
+            {allAssignments.map(a=><option key={a.key} value={a.key}>{a.label}</option>)}
+          </select>
+          <span className="muted">⇄</span>
+          <select value={swapB} onChange={e=>{setSwapB(e.target.value); setSwapMsg(null);}}>
+            <option value="">Dienst 2 wählen …</option>
+            {allAssignments.map(a=><option key={a.key} value={a.key}>{a.label}</option>)}
+          </select>
+          <button className="btn secondary small" onClick={checkSwap}>Prüfen</button>
+          {swapMsg && swapMsg.apply && <button className="btn small" onClick={applySwap}>Tauschen</button>}
+        </div>
+        {swapMsg && <p style={{marginTop:"0.6rem", fontSize:"0.86rem", color: swapMsg.ok ? "var(--accent)" : "var(--warn)"}}>{swapMsg.text}</p>}
+      </div>}
+
+      {!m.plan && participants.length>0 &&
+        <div className="card">
+          <p className="muted" style={{fontSize:"0.9rem"}}>Wenn Auswahl, Sperr- und Wunschtage stehen, erstellt „Plan generieren" den Dienstplan. Der Generator probiert mehrere hundert Varianten und wählt die beste Verteilung.</p>
+        </div>}
+      </div>
+
+      {/* ---------- Druckansicht ---------- */}
+      {m.plan &&
+      <div className="print-sheet">
+        <h1>Dienstplan {MONTH_NAMES[month-1]} {year}</h1>
+        <div className="psub">Ruf- und Bereitschaftsdienste · Stand {new Date().toLocaleDateString("de-DE")}</div>
+        <table>
+          <thead><tr><th>Datum</th><th>Tag</th><th>Rufdienst</th><th>Abteilung</th><th>Bereitschaftsdienst</th><th>Abteilung</th></tr></thead>
+          <tbody>
+            {days.map(day=>{
+              const t = m.plan[day.d] || {};
+              const pr = t.ruf && personById[t.ruf], pb = t.ber && personById[t.ber];
+              return (
+                <tr key={day.d} className={(day.special?"pwe":"") + ((!t.ruf || !t.ber)?" pconf":"")}>
+                  <td>{String(day.d).padStart(2,"0")}.{String(month).padStart(2,"0")}.</td>
+                  <td>{WD_SHORT[day.wd]}{day.holidayName ? " · " + day.holidayName : ""}</td>
+                  <td>{pr ? pr.name : "— unbesetzt —"}</td>
+                  <td>{pr ? deptName(pr.deptId) : ""}</td>
+                  <td>{pb ? pb.name : "— unbesetzt —"}</td>
+                  <td>{pb ? deptName(pb.deptId) : ""}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+        <div className="pfoot">Bereitschaftsdienst jeweils bis zum Folgemorgen. Grau hinterlegt: Wochenende/Feiertag.</div>
+      </div>}
+    </div>
+  );
+}
+
+/* ---------- Statistik ---------- */
+
+function StatsTab({state, monthKey, setMonthKey}){
+  const stats = computeStats(state, monthKey);
+  const {year, month} = parseMonthKey(monthKey);
+  const m = state.months[monthKey];
+  const deptById = {}; state.departments.forEach(d=>deptById[d.id]=d);
+  const [statsYear, setStatsYear] = useState(year);
+  const yearStats = computeYearStats(state, statsYear);
+
+  return (
+    <div>
+      <div className="card">
+        <div className="toolbar">
+          <label style={{fontSize:"0.9rem", fontWeight:600}}>Monat&nbsp;
+            <input type="month" value={monthKey} onChange={e=>{ if(e.target.value) setMonthKey(e.target.value); }}/>
+          </label>
+          <div className="head-spacer"></div>
+          <button className="btn secondary" onClick={()=>exportExcel(state, monthKey)} disabled={!stats}>Excel-Export</button>
+        </div>
+      </div>
+
+      {!stats && <div className="card"><p className="muted" style={{fontSize:"0.9rem"}}>Für {MONTH_NAMES[month-1]} {year} liegt noch kein generierter Plan vor.</p></div>}
+
+      {stats && <>
+      <div className="card">
+        <h2>Dienste pro Person · {MONTH_NAMES[month-1]} {year}</h2>
+        <p className="hint">Über „ICS" lädt jede Person ihre Dienste als Kalenderdatei für Handy oder Outlook herunter.</p>
+        <table>
+          <thead><tr><th>Person</th><th>Fachabteilung</th><th>Ruf</th><th>Bereitschaft</th><th>Werktag</th><th>WE/Feiertag</th><th>davon Feiertag</th><th>Gesamt</th><th></th></tr></thead>
+          <tbody>
+            {state.people.filter(p=> (m.participants||[]).includes(p.id)).map(p=>{
+              const st = stats.perPerson[p.id];
+              const dp = deptById[p.deptId];
+              return (
+                <tr key={p.id}>
+                  <td>{p.name}</td>
+                  <td><span className="dept-dot" style={{background:dp?dp.color:"#999"}}></span>{dp?dp.name:""}</td>
+                  <td className="stat-num">{st.ruf}</td>
+                  <td className="stat-num">{st.ber}</td>
+                  <td className="stat-num">{st.werktag}</td>
+                  <td className="stat-num">{st.we}</td>
+                  <td className="stat-num">{st.feiertag}</td>
+                  <td className="stat-num" style={{fontWeight:600}}>{st.total}</td>
+                  <td><button className="btn secondary small" disabled={st.total===0}
+                    onClick={()=>exportICS(state, monthKey, p.id)}>ICS</button></td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="card">
+        <h2>Dienste pro Fachabteilung</h2>
+        <table>
+          <thead><tr><th>Fachabteilung</th><th>Ruf</th><th>Bereitschaft</th><th>Werktag</th><th>WE/Feiertag</th><th>davon Feiertag</th><th>Gesamt</th></tr></thead>
+          <tbody>
+            {state.departments.map(dp=>{
+              const st = stats.perDept[dp.id];
+              return (
+                <tr key={dp.id}>
+                  <td><span className="dept-dot" style={{background:dp.color}}></span>{dp.name}{dp.priority?" (Priorität WE)":""}</td>
+                  <td className="stat-num">{st.ruf}</td>
+                  <td className="stat-num">{st.ber}</td>
+                  <td className="stat-num">{st.werktag}</td>
+                  <td className="stat-num">{st.we}</td>
+                  <td className="stat-num">{st.feiertag}</td>
+                  <td className="stat-num" style={{fontWeight:600}}>{st.total}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+      </>}
+
+      <div className="card">
+        <h2>Jahresstatistik</h2>
+        <div className="flexrow" style={{marginBottom:"0.7rem"}}>
+          <label style={{fontSize:"0.88rem"}}>Jahr&nbsp;
+            <input type="number" min="2020" max="2100" value={statsYear} style={{width:"5.5rem"}}
+              onChange={e=>setStatsYear(Number(e.target.value)||year)}/>
+          </label>
+        </div>
+        {!yearStats && <p className="muted" style={{fontSize:"0.88rem"}}>Für {statsYear} liegen noch keine generierten Pläne vor.</p>}
+        {yearStats &&
+        <table>
+          <thead><tr><th>Person</th><th>Monate</th><th>Ruf</th><th>Bereitschaft</th><th>Werktag</th><th>WE/Feiertag</th><th>davon Feiertag</th><th>Gesamt</th></tr></thead>
+          <tbody>
+            {state.people.map(p=>{
+              const st = yearStats[p.id];
+              if(!st || st.total===0) return null;
+              return (
+                <tr key={p.id}>
+                  <td>{p.name}</td>
+                  <td className="stat-num">{st.months}</td>
+                  <td className="stat-num">{st.ruf}</td>
+                  <td className="stat-num">{st.ber}</td>
+                  <td className="stat-num">{st.werktag}</td>
+                  <td className="stat-num">{st.we}</td>
+                  <td className="stat-num">{st.feiertag}</td>
+                  <td className="stat-num" style={{fontWeight:600}}>{st.total}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>}
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Wünsche erfassen (Mitarbeiter-Ansicht) ---------- */
+
+function WishTab({state}){
+  const [pid, setPid] = useState("");
+  const [freeName, setFreeName] = useState("");
+  const [mk, setMk] = useState(defaultMonthKey());
+  const [blocked, setBlocked] = useState([]);
+  const [wishes, setWishes] = useState([]);
+  const {year, month} = parseMonthKey(mk);
+  const days = buildDays(year, month);
+
+  useEffect(()=>{ setBlocked([]); setWishes([]); }, [mk, pid]);
+
+  function cycle(d){
+    if(blocked.includes(d)){ setBlocked(blocked.filter(x=>x!==d)); setWishes(wishes.concat([d])); }
+    else if(wishes.includes(d)){ setWishes(wishes.filter(x=>x!==d)); }
+    else { setBlocked(blocked.concat([d])); }
+  }
+  function doExport(){
+    const person = state.people.find(p=>p.id===pid);
+    const name = person ? person.name : freeName.trim();
+    if(!name){ alert("Bitte Name auswählen oder eintragen."); return; }
+    const payload = {
+      type:"dienstwunsch", monthKey:mk,
+      personId: person ? person.id : null,
+      personName: name,
+      blocked: blocked.slice().sort((a,b)=>a-b),
+      wishes: wishes.slice().sort((a,b)=>a-b)
+    };
+    download("Wunsch_" + name.replace(/\s+/g,"_") + "_" + mk + ".json", JSON.stringify(payload, null, 2), "application/json");
+  }
+
+  const firstWd = (days[0].wd + 6) % 7;
+  const cells = [];
+  for(let i=0;i<firstWd;i++) cells.push(null);
+  days.forEach(day=>cells.push(day));
+  while(cells.length % 7 !== 0) cells.push(null);
+
+  return (
+    <div>
+      <div className="card">
+        <h2>Dienstwünsche abgeben</h2>
+        <p className="hint">Für Mitarbeiter: Name und Monat wählen, dann Tage anklicken – einmal für „kann nicht" (✕), zweimal für „Wunschtag" (✓), dreimal zum Zurücksetzen. Anschließend „Wünsche exportieren" und die Datei an die Dienstplanung schicken. Keine markierten Tage bedeutet keine Einschränkung.</p>
+        <div className="flexrow" style={{marginBottom:"0.8rem"}}>
+          <select value={pid} onChange={e=>setPid(e.target.value)}>
+            <option value="">Name wählen …</option>
+            {state.people.filter(p=>p.active).map(p=><option key={p.id} value={p.id}>{p.name}</option>)}
+          </select>
+          {!pid && <input type="text" placeholder="… oder Name eintragen" value={freeName} onChange={e=>setFreeName(e.target.value)}/>}
+          <input type="month" value={mk} onChange={e=>{ if(e.target.value) setMk(e.target.value); }}/>
+        </div>
+        <div className="cal-grid" style={{maxWidth:"40rem"}}>
+          {["Mo","Di","Mi","Do","Fr","Sa","So"].map(w=><div key={w} className="cal-head">{w}</div>)}
+          {cells.map((day, i)=>{
+            if(!day) return <div key={"e"+i} className="cal-day empty-cell" style={{minHeight:"2.6rem"}}></div>;
+            const b = blocked.includes(day.d), w = wishes.includes(day.d);
+            return (
+              <div key={day.d}
+                className={"cal-day" + (day.holidayName?" holiday":(day.isWE?" we":""))}
+                style={{minHeight:"2.6rem", cursor:"pointer", alignItems:"center", justifyContent:"center",
+                  background: b ? "var(--ink)" : (w ? "var(--wish-bg)" : undefined),
+                  color: b ? "#fff" : (w ? "var(--wish)" : undefined), fontWeight: (b||w)?700:400}}
+                title={day.holidayName || ""}
+                onClick={()=>cycle(day.d)}>
+                <span className="mono" style={{fontSize:"0.85rem"}}>{day.d}{b?" ✕":""}{w?" ✓":""}</span>
+              </div>
+            );
+          })}
+        </div>
+        <div style={{marginTop:"0.9rem"}}>
+          <button className="btn" onClick={doExport}>Wünsche exportieren</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
